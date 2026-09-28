@@ -1,1 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
 
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Creator Intelligence Studio - AI-powered YouTube research and production workspace."
+  >
+
+  <title>Creator Intelligence Studio</title>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+  <div class="app-shell">
+
+    <!-- =========================
+         MOBILE OVERLAY
+    ========================== -->
+    <div
+      class="sidebar-overlay"
+      id="sidebarOverlay"
+    ></div>
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+    <aside
+      class="sidebar"
+      id="sidebar"
+    >
+
+      <div class="sidebar-header">
+
+        <div class="brand">
+
+          <div class="brand-logo">
+            CI
+          </div>
+
+          <div class="brand-text">
+            <strong>Creator Intelligence</strong>
+            <span>Studio</span>
+          </div>
+
+        </div>
+
+        <button
+          class="sidebar-close"
+          id="sidebarClose"
+          aria-label="Close sidebar"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <nav class="sidebar-nav">
+
+        <p class="nav-label">
+          Workspace
+        </p>
+
+        <button
+          class="nav-item active"
+          data-section="dashboard"
+        >
+          <span class="nav-icon">⌂</span>
+          <span>Dashboard</span>
+        </button>
+
+        <button
+          class="nav-item"
+          data-section="projects"
+        >
+          <span class="nav-icon">▣</span>
+          <span>Projects</span>
+        </button>
+
+        <button
+          class="nav-item"
+          data-section="research"
+        >
+          <span class="nav-icon">⌕</span>
+          <span>Research</span>
+        </button>
+
+        <button
+          class="nav-item"
+          data-section="sources"
+        >
+          <span class="nav-icon">≡</span>
+          <span>Sources</span>
+        </button>
+
+
+        <p class="nav-label second-label">
+          Production
+        </p>
+
+        <button
+          class="nav-item"
+          data-section="scripts"
+        >
+          <span class="nav-icon">✎</span>
+          <span>Scripts</span>
+        </button>
+
+        <button
+          class="nav-item"
+          data-section="visuals"
+        >
+          <span class="nav-icon">◈</span>
+          <span>Visual Plans</span>
+        </button>
+
+        <button
+          class="nav-item"
+          data-section="publishing"
+        >
+          <span class="nav-icon">↑</span>
+          <span>Publishing</span>
+        </button>
+
+      </nav>
+
+
+      <div class="sidebar-bottom">
+
+        <button
+          class="nav-item"
+          data-section="settings"
+        >
+          <span class="nav-icon">⚙</span>
+          <span>Settings</span>
+        </button>
+
+        <div class="sidebar-version">
+          Creator Intelligence Studio
+          <span id="appVersion"></span>
+        </div>
+
+      </div>
+
+    </aside>
+
+
+    <!-- =========================
+         MAIN APP
+    ========================== -->
+    <main class="main-content">
+
+      <!-- TOPBAR -->
+
+      <header class="topbar">
+
+        <div class="topbar-left">
+
+          <button
+            class="menu-button"
+            id="menuButton"
+            aria-label="Open sidebar"
+          >
+            ☰
+          </button>
+
+          <div>
+
+            <h1 id="pageTitle">
+              Dashboard
+            </h1>
+
+            <p id="pageSubtitle">
+              Research, script, plan and produce your videos.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="topbar-right">
+
+          <div class="system-status">
+            <span class="status-dot"></span>
+            Frontend Ready
+          </div>
+
+          <button
+            class="primary-button desktop-new-project"
+            id="topNewProjectButton"
+          >
+            + New Video
+          </button>
+
+        </div>
+
+      </header>
+
+
+      <!-- =========================
+           DASHBOARD SECTION
+      ========================== -->
+
+      <section
+        class="page-section active-section"
+        id="dashboardSection"
+      >
+
+        <!-- HERO -->
+
+        <section class="hero-card">
+
+          <div class="hero-content">
+
+            <span class="eyebrow">
+              SOLO CREATOR WORKSPACE
+            </span>
+
+            <h2>
+              Turn one idea into a complete
+              <span>video production plan.</span>
+            </h2>
+
+            <p>
+              Start with a topic, news story, article or rough notes.
+              Creator Intelligence Studio will eventually help you
+              research, verify, structure, script and plan the entire video.
+            </p>
+
+          </div>
+
+
+          <div class="hero-badge">
+
+            <div class="hero-badge-number">
+              01
+            </div>
+
+            <div>
+              <strong>Current Stage</strong>
+              <span>Frontend Foundation</span>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- CREATE PROJECT -->
+
+        <section
+          class="panel create-panel"
+          id="createProjectPanel"
+        >
+
+          <div class="panel-header">
+
+            <div>
+              <span class="section-kicker">
+                NEW PROJECT
+              </span>
+
+              <h3>Create a Video Project</h3>
+
+              <p>
+                Paste anything you want to investigate or turn into a video.
+              </p>
+            </div>
+
+          </div>
+
+
+          <form id="projectForm">
+
+            <div class="form-group">
+
+              <label for="projectInput">
+                Topic, article, news, URL or rough notes
+              </label>
+
+              <div class="textarea-wrapper">
+
+                <textarea
+                  id="projectInput"
+                  maxlength="5000"
+                  placeholder="Example: Pakistan has announced a new national AI policy. I want to explain what it means, why it matters, its challenges, and what could happen next."
+                  required
+                ></textarea>
+
+                <div class="textarea-footer">
+
+                  <span>
+                    The research engine will be connected in a later phase.
+                  </span>
+
+                  <span id="characterCounter">
+                    0 / 5000
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="form-grid">
+
+              <div class="form-group">
+
+                <label for="projectLanguage">
+                  Script Language
+                </label>
+
+                <select id="projectLanguage">
+
+                  <option value="english">
+                    English
+                  </option>
+
+                  <option value="urdu">
+                    Urdu
+                  </option>
+
+                  <option value="roman-urdu">
+                    Roman Urdu
+                  </option>
+
+                  <option value="urdu-english">
+                    Urdu + English
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="videoType">
+                  Video Type
+                </label>
+
+                <select id="videoType">
+
+                  <option value="explainer">
+                    Explainer
+                  </option>
+
+                  <option value="documentary">
+                    Documentary
+                  </option>
+
+                  <option value="investigative">
+                    Investigative
+                  </option>
+
+                  <option value="story">
+                    Story
+                  </option>
+
+                  <option value="educational">
+                    Educational
+                  </option>
+
+                  <option value="current-affairs">
+                    Current Affairs
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="videoLength">
+                  Target Length
+                </label>
+
+                <select id="videoLength">
+
+                  <option value="short">
+                    YouTube Short
+                  </option>
+
+                  <option value="5">
+                    Around 5 minutes
+                  </option>
+
+                  <option value="8">
+                    Around 8 minutes
+                  </option>
+
+                  <option value="10" selected>
+                    Around 10 minutes
+                  </option>
+
+                  <option value="15">
+                    Around 15 minutes
+                  </option>
+
+                  <option value="20">
+                    20+ minutes
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="researchDepth">
+                  Research Depth
+                </label>
+
+                <select id="researchDepth">
+
+                  <option value="quick">
+                    Quick
+                  </option>
+
+                  <option value="standard" selected>
+                    Standard
+                  </option>
+
+                  <option value="deep">
+                    Deep Research
+                  </option>
+
+                </select>
+
+              </div>
+
+            </div>
+
+
+            <div class="create-actions">
+
+              <div class="create-note">
+                <span>✓</span>
+                No AI request will be made yet.
+              </div>
+
+              <button
+                class="primary-button large-button"
+                type="submit"
+              >
+                Create Project →
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+
+        <!-- WORKFLOW -->
+
+        <section class="panel">
+
+          <div class="panel-header">
+
+            <div>
+              <span class="section-kicker">
+                PRODUCTION PIPELINE
+              </span>
+
+              <h3>Complete Workflow</h3>
+
+              <p>
+                Every future project will move through these stages.
+              </p>
+            </div>
+
+          </div>
+
+
+          <div class="workflow-grid">
+
+            <div class="workflow-item">
+              <span>01</span>
+              <strong>Input</strong>
+              <small>Topic or information</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>02</span>
+              <strong>Research</strong>
+              <small>Find reliable sources</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>03</span>
+              <strong>Verify</strong>
+              <small>Check claims</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>04</span>
+              <strong>Angle</strong>
+              <small>Choose the story</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>05</span>
+              <strong>Outline</strong>
+              <small>Build structure</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>06</span>
+              <strong>Script</strong>
+              <small>Write narration</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>07</span>
+              <strong>Visuals</strong>
+              <small>B-roll & graphics</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>08</span>
+              <strong>Edit Plan</strong>
+              <small>Timeline instructions</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>09</span>
+              <strong>Package</strong>
+              <small>Title & thumbnail</small>
+            </div>
+
+            <div class="workflow-item">
+              <span>10</span>
+              <strong>Publish</strong>
+              <small>Final checklist</small>
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- PROJECTS -->
+
+        <section class="panel">
+
+          <div class="panel-header project-panel-header">
+
+            <div>
+              <span class="section-kicker">
+                RECENT PROJECTS
+              </span>
+
+              <h3>Your Projects</h3>
+
+              <p>
+                Projects created in this browser appear here.
+              </p>
+            </div>
+
+            <button
+              class="secondary-button"
+              id="clearProjectsButton"
+            >
+              Clear Demo Data
+            </button>
+
+          </div>
+
+
+          <div
+            class="projects-grid"
+            id="projectsGrid"
+          ></div>
+
+
+          <div
+            class="empty-state"
+            id="emptyState"
+          >
+
+            <div class="empty-icon">
+              +
+            </div>
+
+            <h4>No projects yet</h4>
+
+            <p>
+              Create your first video project above.
+            </p>
+
+          </div>
+
+        </section>
+
+
+        <!-- SYSTEM -->
+
+        <section class="system-grid">
+
+          <article class="mini-panel">
+
+            <span class="mini-icon">
+              R
+            </span>
+
+            <div>
+              <strong>Research Engine</strong>
+              <p>Coming in a later phase</p>
+            </div>
+
+            <span class="coming-badge">
+              Planned
+            </span>
+
+          </article>
+
+
+          <article class="mini-panel">
+
+            <span class="mini-icon">
+              AI
+            </span>
+
+            <div>
+              <strong>AI Engine</strong>
+              <p>Secure backend required</p>
+            </div>
+
+            <span class="coming-badge">
+              Planned
+            </span>
+
+          </article>
+
+
+          <article class="mini-panel">
+
+            <span class="mini-icon">
+              DB
+            </span>
+
+            <div>
+              <strong>Database</strong>
+              <p>Google Sheets integration</p>
+            </div>
+
+            <span class="coming-badge">
+              Planned
+            </span>
+
+          </article>
+
+        </section>
+
+      </section>
+
+
+      <!-- =========================
+           PLACEHOLDER SECTIONS
+      ========================== -->
+
+      <section
+        class="page-section placeholder-section"
+        id="projectsSection"
+      >
+        <div class="placeholder-card">
+          <span>PROJECTS</span>
+          <h2>Project Library</h2>
+          <p>
+            The complete project-management interface will be built
+            in a later phase.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="researchSection"
+      >
+        <div class="placeholder-card">
+          <span>RESEARCH</span>
+          <h2>Research Engine</h2>
+          <p>
+            Source discovery, evidence collection and topic analysis
+            will live here.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="sourcesSection"
+      >
+        <div class="placeholder-card">
+          <span>SOURCES</span>
+          <h2>Source Library</h2>
+          <p>
+            Verified sources and evidence-linked claims will be
+            organized here.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="scriptsSection"
+      >
+        <div class="placeholder-card">
+          <span>SCRIPTS</span>
+          <h2>Script Workspace</h2>
+          <p>
+            Hooks, outlines, narration and citations will be managed here.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="visualsSection"
+      >
+        <div class="placeholder-card">
+          <span>VISUALS</span>
+          <h2>Visual Planning</h2>
+          <p>
+            B-roll, graphics, maps and editing directions will appear here.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="publishingSection"
+      >
+        <div class="placeholder-card">
+          <span>PUBLISHING</span>
+          <h2>Publishing Package</h2>
+          <p>
+            Titles, thumbnails, descriptions, chapters and Shorts
+            will be prepared here.
+          </p>
+        </div>
+      </section>
+
+
+      <section
+        class="page-section placeholder-section"
+        id="settingsSection"
+      >
+        <div class="placeholder-card">
+          <span>SETTINGS</span>
+          <h2>System Settings</h2>
+          <p>
+            Public configuration and future backend preferences will
+            be managed here.
+          </p>
+        </div>
+      </section>
+
+
+      <footer class="app-footer">
+
+        <span>
+          Creator Intelligence Studio
+        </span>
+
+        <span>
+          Built for a solo creator workflow.
+        </span>
+
+      </footer>
+
+    </main>
+
+  </div>
+
+
+  <!-- =========================
+       TOAST
+  ========================== -->
+
+  <div
+    class="toast"
+    id="toast"
+    role="status"
+    aria-live="polite"
+  >
+    <span id="toastMessage"></span>
+  </div>
+
+
+  <!-- =========================
+       SCRIPTS
+  ========================== -->
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>
