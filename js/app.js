@@ -1110,6 +1110,183 @@ function updateResearchSummary(
 
 }
 
+async function handleAddSource(event) {
+
+  event.preventDefault();
+
+
+  if (!CreatorAPI.hasAdminToken()) {
+
+    showToast(
+      "Connect your Admin Session first."
+    );
+
+    openAdminModal();
+
+    return;
+
+  }
+
+
+  const projectSelect =
+    document.getElementById(
+      "researchProjectSelect"
+    );
+
+
+  const projectId =
+    String(
+      projectSelect?.value || ""
+    ).trim();
+
+
+  if (!projectId) {
+
+    showToast(
+      "Select a project first."
+    );
+
+    return;
+
+  }
+
+
+  const url =
+    document
+      .getElementById(
+        "sourceUrl"
+      )
+      .value
+      .trim();
+
+
+  if (!url) {
+
+    showToast(
+      "Enter a source URL."
+    );
+
+    return;
+
+  }
+
+
+  const submitButton =
+    event.currentTarget
+      .querySelector(
+        'button[type="submit"]'
+      );
+
+
+  const originalText =
+    submitButton.textContent;
+
+
+  submitButton.disabled =
+    true;
+
+  submitButton.textContent =
+    "Adding Source...";
+
+
+  try {
+
+    await CreatorAPI.addSource({
+
+      projectId,
+
+      url,
+
+      title:
+        document
+          .getElementById(
+            "sourceTitle"
+          )
+          .value
+          .trim(),
+
+      publisher:
+        document
+          .getElementById(
+            "sourcePublisher"
+          )
+          .value
+          .trim(),
+
+      author:
+        document
+          .getElementById(
+            "sourceAuthor"
+          )
+          .value
+          .trim(),
+
+      sourceType:
+        document
+          .getElementById(
+            "sourceType"
+          )
+          .value,
+
+      sourceTier:
+        document
+          .getElementById(
+            "sourceTier"
+          )
+          .value,
+
+      reliabilityLabel:
+        document
+          .getElementById(
+            "sourceReliability"
+          )
+          .value,
+
+      isPrimarySource:
+        document
+          .getElementById(
+            "sourcePrimary"
+          )
+          .value === "true"
+
+    });
+
+
+    event.currentTarget.reset();
+
+
+    await loadProjectResearch(
+      projectId
+    );
+
+
+    showToast(
+      "Source added successfully."
+    );
+
+  }
+  catch (error) {
+
+    console.error(
+      "Add source error:",
+      error
+    );
+
+
+    handleApiError(error);
+
+  }
+  finally {
+
+    submitButton.disabled =
+      false;
+
+    submitButton.textContent =
+      originalText;
+
+  }
+
+}
 /* =====================================================
    PROJECT CREATION
 ===================================================== */
