@@ -42,6 +42,8 @@ async function initializeApplication() {
 
   setupVisualWorkspace();
 
+  setupPublishingWorkspace();
+
   await checkBackendHealth();
 
   updateAuthenticationUI();
@@ -937,7 +939,7 @@ function populateResearchProjectSelect(
 }
 
 function populateScriptProjectSelect(projects) {
-  ["scriptProjectSelect", "visualProjectSelect", "editProjectSelect"].forEach(selectId => {
+  ["scriptProjectSelect", "visualProjectSelect", "editProjectSelect", "publishingProjectSelect"].forEach(selectId => {
     const select = document.getElementById(selectId);
     if (!select) return;
     select.innerHTML = '<option value="">Choose a project...</option>';
@@ -954,6 +956,25 @@ function setupScriptWorkspace() {
 function setupVisualWorkspace() {
   document.getElementById("visualForm")?.addEventListener("submit", handleAddVisual);
   document.getElementById("editBlueprintForm")?.addEventListener("submit", handleAddEditBlueprint);
+}
+
+function setupPublishingWorkspace() {
+  document.getElementById("publishingForm")?.addEventListener("submit", handleAddPublishingPackage);
+}
+
+async function handleAddPublishingPackage(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("publishingProjectSelect")?.value || "").trim();
+  const selectedTitle = String(document.getElementById("selectedTitle")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) { showToast("Connect your Admin Session first."); openAdminModal(); return; }
+  if (!projectId || !selectedTitle) { showToast("Choose a project and enter the selected title."); return; }
+  const value = id => String(document.getElementById(id)?.value || "").trim();
+  await submitProductionForm(form, "Saving Package...", () => CreatorAPI.addPublishingPackage({
+    projectId, selectedTitle, selectedThumbnail: value("selectedThumbnail"), titleOptions: value("titleOptions"),
+    thumbnailConcepts: value("thumbnailConcepts"), description: value("publishingDescription"),
+    chapters: value("publishingChapters"), tags: value("publishingTags"), hashtags: value("publishingHashtags"), shortIdeas: value("shortIdeas"), status: "draft"
+  }));
 }
 
 async function submitProductionForm(form, buttonLabel, task) {

@@ -343,6 +343,8 @@ async function addVisual(visualData) { return request("addVisual", visualData); 
 
 async function addEditBlueprint(editData) { return request("addEditBlueprint", editData); }
 
+async function addPublishingPackage(packageData) { return request("addPublishing", packageData); }
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -435,7 +437,9 @@ async function addEditBlueprint(editData) { return request("addEditBlueprint", e
 
     addVisual,
 
-    addEditBlueprint
+    addEditBlueprint,
+
+    addPublishingPackage
 
   });
 
