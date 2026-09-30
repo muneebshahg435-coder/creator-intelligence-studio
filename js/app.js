@@ -1061,8 +1061,34 @@ async function loadProjectResearch(
 }
 
 function renderResearchLists(sources, findings) {
+  populateFindingSourceSelect(sources);
   renderSourceList(sources);
-  renderFindingList(findings);
+  renderFindingList(findings, sources);
+}
+
+function populateFindingSourceSelect(sources) {
+  const select = document.getElementById("researchSourceIds");
+  if (!select) return;
+
+  const selectedIds = new Set(
+    Array.from(select.selectedOptions).map(option => option.value)
+  );
+
+  select.replaceChildren();
+
+  if (!sources.length) {
+    const option = new Option("No sources available yet", "");
+    option.disabled = true;
+    select.add(option);
+    return;
+  }
+
+  sources.forEach(source => {
+    const label = source.title || source.url || source.sourceId;
+    const option = new Option(label, source.sourceId);
+    option.selected = selectedIds.has(source.sourceId);
+    select.add(option);
+  });
 }
 
 function renderSourceList(sources) {
@@ -1084,19 +1110,30 @@ function renderSourceList(sources) {
   }).join("");
 }
 
-function renderFindingList(findings) {
+function renderFindingList(findings, sources = []) {
   const list = document.getElementById("findingsList");
   if (!list) return;
   if (!findings.length) {
     list.innerHTML = '<p class="muted-copy">No findings have been saved for this project.</p>';
     return;
   }
+  const sourceLabels = new Map(
+    sources.map(source => [source.sourceId, source.title || source.url || source.sourceId])
+  );
   list.innerHTML = findings.map(finding => {
     const claim = finding.finding || finding.claim || finding.text || "Untitled finding";
     const meta = [finding.section, formatLabel(finding.importance)]
       .filter(Boolean).map(escapeHTML).join(" · ");
     const state = formatLabel(finding.verificationStatus || "unverified");
-    return `<article class="research-item finding-item"><div><p class="finding-copy">${escapeHTML(claim)}</p><p>${meta || "No section or priority set"}</p></div><span class="status-pill status-${escapeHTML(String(finding.verificationStatus || "unverified"))}">${escapeHTML(state)}</span></article>`;
+    const linkedSources = (finding.sourceIds || [])
+      .map(sourceId => sourceLabels.get(sourceId) || sourceId)
+      .filter(Boolean)
+      .map(escapeHTML)
+      .join(" · ");
+    const evidence = linkedSources
+      ? `<p class="evidence-links">Evidence: ${linkedSources}</p>`
+      : '<p class="evidence-links">Evidence: no source linked</p>';
+    return `<article class="research-item finding-item"><div><p class="finding-copy">${escapeHTML(claim)}</p><p>${meta || "No section or priority set"}</p>${evidence}</div><span class="status-pill status-${escapeHTML(String(finding.verificationStatus || "unverified"))}">${escapeHTML(state)}</span></article>`;
   }).join("");
 }
 
@@ -1373,7 +1410,10 @@ async function handleAddResearchFinding(event) {
       finding,
       section: String(document.getElementById("researchSection")?.value || "").trim(),
       importance: document.getElementById("researchImportance")?.value || "medium",
-      verificationStatus: document.getElementById("researchVerificationStatus")?.value || "unverified"
+      verificationStatus: document.getElementById("researchVerificationStatus")?.value || "unverified",
+      sourceIds: Array.from(
+        document.getElementById("researchSourceIds")?.selectedOptions || []
+      ).map(option => option.value).filter(Boolean)
     });
     form.reset();
     await loadProjectResearch(projectId);

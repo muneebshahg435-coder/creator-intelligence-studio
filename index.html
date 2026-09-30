@@ -1063,6 +1063,11 @@
             <label for="researchVerificationStatus">Verification state</label>
             <select id="researchVerificationStatus"><option value="unverified">Unverified</option><option value="partially-verified">Partially verified</option><option value="verified">Verified</option><option value="disputed">Disputed</option><option value="outdated">Outdated</option></select>
           </div>
+          <div class="form-group">
+            <label for="researchSourceIds">Supporting sources</label>
+            <select id="researchSourceIds" multiple size="4" aria-describedby="researchSourceHelp"></select>
+            <small id="researchSourceHelp" class="field-help">Select every source that supports this finding. Add sources above first.</small>
+          </div>
         </div>
         <div class="create-actions">
           <div class="create-note"><span>✓</span>Claims remain clearly labelled until verified.</div>

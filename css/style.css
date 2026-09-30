@@ -1908,6 +1908,19 @@ button:disabled {
 .research-item p, .muted-copy { color: var(--text-secondary); font-size: 12px; line-height: 1.5; margin-top: 5px; }
 .finding-copy { color: var(--text-primary) !important; }
 
+.evidence-links {
+  color: var(--text-muted) !important;
+  font-size: 11px !important;
+}
+
+.field-help {
+  display: block;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
 .status-pill {
   flex: 0 0 auto;
   border: 1px solid var(--border-light);
