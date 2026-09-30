@@ -852,6 +852,16 @@ function setupResearchWorkspace() {
 
 }
 
+  const sourceForm =
+    document.getElementById(
+      "sourceForm"
+    );
+
+
+  sourceForm?.addEventListener(
+    "submit",
+    handleAddSource
+  );
 
 function populateResearchProjectSelect(
   projects
