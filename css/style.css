@@ -1852,3 +1852,40 @@ button:disabled {
   }
 
 }
+/* =========================================================
+   PHASE 4
+   RESEARCH WORKSPACE
+========================================================= */
+
+.research-summary-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+
+#researchWorkspace[hidden] {
+  display: none;
+}
+
+
+#researchWorkspace {
+  animation: fadeIn 0.22s ease;
+}
+
+
+#researchProjectSelect {
+  max-width: 520px;
+}
+
+
+@media (max-width: 850px) {
+
+  .research-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
