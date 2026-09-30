@@ -7,11 +7,11 @@ PUBLIC FRONTEND CONFIGURATION
 =========================================================
 
 IMPORTANT:
-Never place private API keys, passwords,
-tokens or secret credentials in this file.
+Never place API keys, passwords, admin tokens,
+or other private credentials in this file.
 
-Anything stored here can eventually be visible
-to website visitors.
+This file is PUBLIC because the GitHub repository
+and website are public.
 */
 
 
@@ -19,20 +19,40 @@ const APP_CONFIG = Object.freeze({
 
   appName: "Creator Intelligence Studio",
 
-  version: "v0.1.0",
+  version: "v0.2.0",
 
-  environment: "development",
+  environment: "production",
 
-  backendEnabled: false,
+  backendEnabled: true,
 
-  apiBaseUrl: "",
+  /*
+  =======================================================
+  PASTE ONLY YOUR APPS SCRIPT /exec URL BELOW.
 
-  storageKeys: Object.freeze({
-    projects: "cis_projects_v1"
+  SAFE TO STORE:
+  Apps Script public web-app URL.
+
+  NEVER STORE:
+  Admin Token
+  AI API keys
+  Passwords
+  =======================================================
+  */
+
+  apiBaseUrl:
+    "https://script.google.com/macros/s/AKfycbzSvWHpC7EWOWqAyQFv07vaICUpDgaBdLFu0SWgi9Jgin2nF8B8ZMUOlywP8rO3dJNxYw/exec",
+
+  sessionKeys: Object.freeze({
+
+    adminToken:
+      "cis_admin_token_v1"
+
   }),
 
   limits: Object.freeze({
+
     projectInputMaxLength: 5000
+
   })
 
 });
