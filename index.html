@@ -252,8 +252,8 @@
 
             <p>
               Start with a topic, news story, article or rough notes.
-              Creator Intelligence Studio will eventually help you
-              research, verify, structure, script and plan the entire video.
+              Creator Intelligence Studio helps you research, verify,
+              structure, script and plan the entire video.
             </p>
 
           </div>
@@ -267,7 +267,7 @@
 
             <div>
               <strong>Current Stage</strong>
-              <span>Frontend Foundation</span>
+              <span>Production Workflow</span>
             </div>
 
           </div>
@@ -319,7 +319,7 @@
                 <div class="textarea-footer">
 
                   <span>
-                    The research engine will be connected in a later phase.
+                    Your input becomes the starting point for the evidence workflow.
                   </span>
 
                   <span id="characterCounter">
@@ -635,11 +635,11 @@
 
             <div>
               <strong>Research Engine</strong>
-              <p>Coming in a later phase</p>
+              <p>Sources, findings, claims and briefs</p>
             </div>
 
             <span class="coming-badge">
-              Planned
+              Active
             </span>
 
           </article>
@@ -653,11 +653,11 @@
 
             <div>
               <strong>AI Engine</strong>
-              <p>Secure backend required</p>
+              <p>Optional server-side provider connection</p>
             </div>
 
             <span class="coming-badge">
-              Planned
+              Optional
             </span>
 
           </article>
@@ -671,11 +671,11 @@
 
             <div>
               <strong>Database</strong>
-              <p>Google Sheets integration</p>
+              <p>Google Sheets workflow storage</p>
             </div>
 
             <span class="coming-badge">
-              Planned
+              Active
             </span>
 
           </article>
@@ -1145,6 +1145,17 @@
       </section>
     </section>
 
+    <section class="research-results-grid" aria-live="polite">
+      <section class="panel research-list-panel">
+        <div class="panel-header"><div><span class="section-kicker">CLAIM REVIEW</span><h3>Saved Claims</h3></div></div>
+        <div id="claimsList" class="research-list"><p class="muted-copy">Choose a project to load its claims.</p></div>
+      </section>
+      <section class="panel research-list-panel">
+        <div class="panel-header"><div><span class="section-kicker">STORY DEVELOPMENT</span><h3>Saved Angles</h3></div></div>
+        <div id="anglesList" class="research-list"><p class="muted-copy">Choose a project to load its story angles.</p></div>
+      </section>
+    </section>
+
     <section class="panel research-entry-panel">
       <div class="panel-header">
         <div><span class="section-kicker">RESEARCH BRIEF</span><h3>Evidence Summary</h3><p>Generate a structured brief from the selected project’s saved sources and findings.</p></div>
@@ -1162,14 +1173,22 @@
         class="page-section placeholder-section"
         id="sourcesSection"
       >
-        <div class="placeholder-card">
-          <span>SOURCES</span>
-          <h2>Source Library</h2>
-          <p>
-            Verified sources and evidence-linked claims will be
-            organized here.
-          </p>
-        </div>
+        <section class="panel research-entry-panel">
+          <div class="panel-header">
+            <div>
+              <span class="section-kicker">SOURCE LIBRARY</span>
+              <h2>Project Sources</h2>
+              <p>Review the saved evidence register for one project.</p>
+            </div>
+          </div>
+          <div class="form-group source-library-selector">
+            <label for="sourceLibraryProjectSelect">Project</label>
+            <select id="sourceLibraryProjectSelect"><option value="">Choose a project...</option></select>
+          </div>
+          <div id="sourceLibraryList" class="research-list" aria-live="polite">
+            <p class="muted-copy">Choose a project to load its sources.</p>
+          </div>
+        </section>
       </section>
 
 
@@ -1193,6 +1212,10 @@
             <div class="form-grid"><div class="form-group"><label for="scriptVisualNotes">Visual notes</label><textarea class="text-input" id="scriptVisualNotes" rows="4" maxlength="4000" placeholder="B-roll, maps, charts, screenshots, graphics..."></textarea></div><div class="form-group"><label for="scriptEditNotes">Editing notes</label><textarea class="text-input" id="scriptEditNotes" rows="4" maxlength="4000" placeholder="Pacing, cuts, sound design, emphasis..."></textarea></div></div>
             <div class="create-actions"><div class="create-note"><span>✓</span>Save only material you can support with the linked evidence.</div><button class="primary-button" type="submit">Save Script Section</button></div>
           </form>
+          <div class="saved-work-panel" aria-live="polite">
+            <div class="saved-work-heading"><span class="section-kicker">SAVED WORK</span><h3>Script Sections</h3></div>
+            <div id="scriptSectionsList" class="research-list"><p class="muted-copy">Choose a project to load its script sections.</p></div>
+          </div>
         </section>
       </section>
 
@@ -1201,8 +1224,8 @@
         class="page-section placeholder-section"
         id="visualsSection"
       >
-        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">VISUAL PLAN</span><h2>Visual Planning</h2><p>Plan every B-roll item, graphic, chart, or screen capture before editing.</p></div></div><form id="visualForm"><div class="form-grid"><div class="form-group"><label for="visualProjectSelect">Project</label><select id="visualProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="visualScriptId">Script section ID</label><input class="text-input" id="visualScriptId" maxlength="100" placeholder="Optional script reference"></div><div class="form-group"><label for="visualType">Visual type</label><input class="text-input" id="visualType" maxlength="100" placeholder="B-roll, map, chart, graphic..."></div><div class="form-group"><label for="visualDuration">Estimated duration</label><input class="text-input" id="visualDuration" maxlength="30" placeholder="3 seconds"></div></div><div class="form-group"><label for="visualDescription">Visual description</label><textarea class="text-input" id="visualDescription" rows="4" maxlength="4000" required placeholder="What must the viewer see?"></textarea></div><div class="form-grid"><div class="form-group"><label for="visualSearchQuery">Search or generation prompt</label><textarea class="text-input" id="visualSearchQuery" rows="3" maxlength="500" placeholder="Useful search terms or an original visual prompt."></textarea></div><div class="form-group"><label for="visualOnScreenText">On-screen text</label><textarea class="text-input" id="visualOnScreenText" rows="3" maxlength="1000" placeholder="Keep copy short and checkable."></textarea></div></div><div class="create-actions"><div class="create-note"><span>✓</span>Use original or licensed assets only.</div><button class="primary-button" type="submit">Save Visual Item</button></div></form></section>
-        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">EDITING BLUEPRINT</span><h3>Plan an Edit Beat</h3><p>Record timing, A-roll, B-roll, graphics, transitions, and sound direction.</p></div></div><form id="editBlueprintForm"><div class="form-grid"><div class="form-group"><label for="editProjectSelect">Project</label><select id="editProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="editScriptId">Script section ID</label><input class="text-input" id="editScriptId" maxlength="100"></div><div class="form-group"><label for="editStartTime">Start</label><input class="text-input" id="editStartTime" maxlength="20" placeholder="00:00"></div><div class="form-group"><label for="editEndTime">End</label><input class="text-input" id="editEndTime" maxlength="20" placeholder="00:05"></div></div><div class="form-grid"><div class="form-group"><label for="editARoll">A-roll</label><textarea class="text-input" id="editARoll" rows="3" maxlength="2000"></textarea></div><div class="form-group"><label for="editBRoll">B-roll</label><textarea class="text-input" id="editBRoll" rows="3" maxlength="4000"></textarea></div><div class="form-group"><label for="editGraphics">Graphics</label><textarea class="text-input" id="editGraphics" rows="3" maxlength="4000"></textarea></div><div class="form-group"><label for="editSoundDesign">Sound design</label><textarea class="text-input" id="editSoundDesign" rows="3" maxlength="2000"></textarea></div></div><div class="form-group"><label for="editNotes">Editing notes</label><textarea class="text-input" id="editNotes" rows="3" maxlength="4000" required placeholder="Pacing, emphasis, transitions, and accessibility notes."></textarea></div><div class="create-actions"><button class="primary-button" type="submit">Save Edit Beat</button></div></form></section>
+        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">VISUAL PLAN</span><h2>Visual Planning</h2><p>Plan every B-roll item, graphic, chart, or screen capture before editing.</p></div></div><form id="visualForm"><div class="form-grid"><div class="form-group"><label for="visualProjectSelect">Project</label><select id="visualProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="visualScriptId">Script section ID</label><input class="text-input" id="visualScriptId" maxlength="100" placeholder="Optional script reference"></div><div class="form-group"><label for="visualType">Visual type</label><input class="text-input" id="visualType" maxlength="100" placeholder="B-roll, map, chart, graphic..."></div><div class="form-group"><label for="visualDuration">Estimated duration</label><input class="text-input" id="visualDuration" maxlength="30" placeholder="3 seconds"></div></div><div class="form-group"><label for="visualDescription">Visual description</label><textarea class="text-input" id="visualDescription" rows="4" maxlength="4000" required placeholder="What must the viewer see?"></textarea></div><div class="form-grid"><div class="form-group"><label for="visualSearchQuery">Search or generation prompt</label><textarea class="text-input" id="visualSearchQuery" rows="3" maxlength="500" placeholder="Useful search terms or an original visual prompt."></textarea></div><div class="form-group"><label for="visualOnScreenText">On-screen text</label><textarea class="text-input" id="visualOnScreenText" rows="3" maxlength="1000" placeholder="Keep copy short and checkable."></textarea></div></div><div class="create-actions"><div class="create-note"><span>✓</span>Use original or licensed assets only.</div><button class="primary-button" type="submit">Save Visual Item</button></div></form><div class="saved-work-panel" aria-live="polite"><div class="saved-work-heading"><span class="section-kicker">SAVED WORK</span><h3>Visual Items</h3></div><div id="visualPlanList" class="research-list"><p class="muted-copy">Choose a project to load its visual plan.</p></div></div></section>
+        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">EDITING BLUEPRINT</span><h3>Plan an Edit Beat</h3><p>Record timing, A-roll, B-roll, graphics, transitions, and sound direction.</p></div></div><form id="editBlueprintForm"><div class="form-grid"><div class="form-group"><label for="editProjectSelect">Project</label><select id="editProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="editScriptId">Script section ID</label><input class="text-input" id="editScriptId" maxlength="100"></div><div class="form-group"><label for="editStartTime">Start</label><input class="text-input" id="editStartTime" maxlength="20" placeholder="00:00"></div><div class="form-group"><label for="editEndTime">End</label><input class="text-input" id="editEndTime" maxlength="20" placeholder="00:05"></div></div><div class="form-grid"><div class="form-group"><label for="editARoll">A-roll</label><textarea class="text-input" id="editARoll" rows="3" maxlength="2000"></textarea></div><div class="form-group"><label for="editBRoll">B-roll</label><textarea class="text-input" id="editBRoll" rows="3" maxlength="4000"></textarea></div><div class="form-group"><label for="editGraphics">Graphics</label><textarea class="text-input" id="editGraphics" rows="3" maxlength="4000"></textarea></div><div class="form-group"><label for="editSoundDesign">Sound design</label><textarea class="text-input" id="editSoundDesign" rows="3" maxlength="2000"></textarea></div></div><div class="form-group"><label for="editNotes">Editing notes</label><textarea class="text-input" id="editNotes" rows="3" maxlength="4000" required placeholder="Pacing, emphasis, transitions, and accessibility notes."></textarea></div><div class="create-actions"><button class="primary-button" type="submit">Save Edit Beat</button></div></form><div class="saved-work-panel" aria-live="polite"><div class="saved-work-heading"><span class="section-kicker">SAVED WORK</span><h3>Edit Beats</h3></div><div id="editBlueprintList" class="research-list"><p class="muted-copy">Choose a project to load its editing blueprint.</p></div></div></section>
       </section>
 
 
@@ -1210,7 +1233,7 @@
         class="page-section placeholder-section"
         id="publishingSection"
       >
-        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">PUBLISHING PACKAGE</span><h2>Package the Video</h2><p>Keep title, thumbnail, metadata, chapters, and Shorts ideas together for review.</p></div></div><form id="publishingForm"><div class="form-grid"><div class="form-group"><label for="publishingProjectSelect">Project</label><select id="publishingProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="selectedTitle">Selected title</label><input class="text-input" id="selectedTitle" maxlength="200" required placeholder="Final working title"></div><div class="form-group"><label for="selectedThumbnail">Selected thumbnail concept</label><input class="text-input" id="selectedThumbnail" maxlength="2000" placeholder="Main visual, short text, expression or subject"></div></div><div class="form-grid"><div class="form-group"><label for="titleOptions">Title options</label><textarea class="text-input" id="titleOptions" rows="4" maxlength="4000" placeholder="One option per line"></textarea></div><div class="form-group"><label for="thumbnailConcepts">Thumbnail concepts</label><textarea class="text-input" id="thumbnailConcepts" rows="4" maxlength="4000" placeholder="One concept per line"></textarea></div></div><div class="form-group"><label for="publishingDescription">Video description</label><textarea class="text-input" id="publishingDescription" rows="6" maxlength="10000"></textarea></div><div class="form-grid"><div class="form-group"><label for="publishingChapters">Chapters</label><textarea class="text-input" id="publishingChapters" rows="4" maxlength="4000" placeholder="00:00 Introduction"></textarea></div><div class="form-group"><label for="publishingTags">Tags</label><textarea class="text-input" id="publishingTags" rows="4" maxlength="2000" placeholder="Comma-separated"></textarea></div><div class="form-group"><label for="publishingHashtags">Hashtags</label><textarea class="text-input" id="publishingHashtags" rows="4" maxlength="1000"></textarea></div><div class="form-group"><label for="shortIdeas">Shorts ideas</label><textarea class="text-input" id="shortIdeas" rows="4" maxlength="4000"></textarea></div></div><div class="create-actions"><button class="primary-button" type="submit">Save Publishing Package</button></div></form></section>
+        <section class="panel research-entry-panel"><div class="panel-header"><div><span class="section-kicker">PUBLISHING PACKAGE</span><h2>Package the Video</h2><p>Keep title, thumbnail, metadata, chapters, and Shorts ideas together for review.</p></div></div><form id="publishingForm"><div class="form-grid"><div class="form-group"><label for="publishingProjectSelect">Project</label><select id="publishingProjectSelect" required><option value="">Choose a project...</option></select></div><div class="form-group"><label for="selectedTitle">Selected title</label><input class="text-input" id="selectedTitle" maxlength="200" required placeholder="Final working title"></div><div class="form-group"><label for="selectedThumbnail">Selected thumbnail concept</label><input class="text-input" id="selectedThumbnail" maxlength="2000" placeholder="Main visual, short text, expression or subject"></div></div><div class="form-grid"><div class="form-group"><label for="titleOptions">Title options</label><textarea class="text-input" id="titleOptions" rows="4" maxlength="4000" placeholder="One option per line"></textarea></div><div class="form-group"><label for="thumbnailConcepts">Thumbnail concepts</label><textarea class="text-input" id="thumbnailConcepts" rows="4" maxlength="4000" placeholder="One concept per line"></textarea></div></div><div class="form-group"><label for="publishingDescription">Video description</label><textarea class="text-input" id="publishingDescription" rows="6" maxlength="10000"></textarea></div><div class="form-grid"><div class="form-group"><label for="publishingChapters">Chapters</label><textarea class="text-input" id="publishingChapters" rows="4" maxlength="4000" placeholder="00:00 Introduction"></textarea></div><div class="form-group"><label for="publishingTags">Tags</label><textarea class="text-input" id="publishingTags" rows="4" maxlength="2000" placeholder="Comma-separated"></textarea></div><div class="form-group"><label for="publishingHashtags">Hashtags</label><textarea class="text-input" id="publishingHashtags" rows="4" maxlength="1000"></textarea></div><div class="form-group"><label for="shortIdeas">Shorts ideas</label><textarea class="text-input" id="shortIdeas" rows="4" maxlength="4000"></textarea></div></div><div class="create-actions"><button class="primary-button" type="submit">Save Publishing Package</button></div></form><div class="saved-work-panel" aria-live="polite"><div class="saved-work-heading"><span class="section-kicker">SAVED WORK</span><h3>Publishing Packages</h3></div><div id="publishingPackagesList" class="research-list"><p class="muted-copy">Choose a project to load its publishing packages.</p></div></div></section>
       </section>
 
 

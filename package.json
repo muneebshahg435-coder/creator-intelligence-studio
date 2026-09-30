@@ -1,0 +1,8 @@
+{
+  "name": "creator-intelligence-studio",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/static-check.mjs"
+  }
+}

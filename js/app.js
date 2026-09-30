@@ -3,7 +3,7 @@
 /*
 =========================================================
 CREATOR INTELLIGENCE STUDIO
-FRONTEND APPLICATION — v0.2
+FRONTEND APPLICATION — v0.3
 =========================================================
 */
 
@@ -37,6 +37,8 @@ async function initializeApplication() {
   setupAdminAuthentication();
 
   setupResearchWorkspace();
+
+  setupSourceLibrary();
 
   setupScriptWorkspace();
 
@@ -838,6 +840,19 @@ function updateCharacterCounter() {
 let researchProjectsCache = [];
 let currentResearchSources = [];
 let currentResearchFindings = [];
+let currentProjectProduction = createEmptyProductionState();
+
+
+function createEmptyProductionState() {
+  return {
+    claims: [],
+    angles: [],
+    scripts: [],
+    visuals: [],
+    editBlueprints: [],
+    publishingPackages: []
+  };
+}
 
 
 function setupResearchWorkspace() {
@@ -942,29 +957,68 @@ function populateResearchProjectSelect(
 
   populateScriptProjectSelect(researchProjectsCache);
 
+  populateProjectSelect("sourceLibraryProjectSelect", researchProjectsCache);
+
+}
+
+function populateProjectSelect(selectId, projects) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const previousValue = select.value;
+  select.innerHTML = '<option value="">Choose a project...</option>';
+  projects.forEach(project => select.add(new Option(project.title || project.projectId, project.projectId)));
+  if (projects.some(project => project.projectId === previousValue)) {
+    select.value = previousValue;
+  }
 }
 
 function populateScriptProjectSelect(projects) {
   ["scriptProjectSelect", "visualProjectSelect", "editProjectSelect", "publishingProjectSelect"].forEach(selectId => {
-    const select = document.getElementById(selectId);
-    if (!select) return;
-    select.innerHTML = '<option value="">Choose a project...</option>';
-    projects.forEach(project => select.add(new Option(project.title || project.projectId, project.projectId)));
+    populateProjectSelect(selectId, projects);
   });
+}
+
+function setupSourceLibrary() {
+  document.getElementById("sourceLibraryProjectSelect")
+    ?.addEventListener("change", handleSourceLibrarySelection);
+}
+
+async function handleSourceLibrarySelection(event) {
+  const projectId = String(event.target.value || "").trim();
+  if (!projectId) {
+    renderSourceList([], "sourceLibraryList");
+    return;
+  }
+  if (!CreatorAPI.hasAdminToken()) {
+    showToast("Connect your Admin Session first.");
+    openAdminModal();
+    return;
+  }
+  try {
+    const response = await CreatorAPI.getProjectResearch(projectId);
+    renderSourceList(response.sources || [], "sourceLibraryList");
+  }
+  catch (error) {
+    console.error("Load source library error:", error);
+    handleApiError(error);
+  }
 }
 
 function setupScriptWorkspace() {
   const projectSelect = document.getElementById("scriptProjectSelect");
-  projectSelect?.addEventListener("change", loadScriptSourceOptions);
+  projectSelect?.addEventListener("change", handleProductionProjectSelection);
   document.getElementById("scriptSectionForm")?.addEventListener("submit", handleAddScriptSection);
 }
 
 function setupVisualWorkspace() {
+  document.getElementById("visualProjectSelect")?.addEventListener("change", handleProductionProjectSelection);
+  document.getElementById("editProjectSelect")?.addEventListener("change", handleProductionProjectSelection);
   document.getElementById("visualForm")?.addEventListener("submit", handleAddVisual);
   document.getElementById("editBlueprintForm")?.addEventListener("submit", handleAddEditBlueprint);
 }
 
 function setupPublishingWorkspace() {
+  document.getElementById("publishingProjectSelect")?.addEventListener("change", handleProductionProjectSelection);
   document.getElementById("publishingForm")?.addEventListener("submit", handleAddPublishingPackage);
 }
 
@@ -988,9 +1042,23 @@ async function submitProductionForm(form, buttonLabel, task) {
   const originalText = submitButton.textContent;
   submitButton.disabled = true;
   submitButton.textContent = buttonLabel;
-  try { await task(); form.reset(); showToast("Saved successfully."); }
+  try {
+    await task();
+    const projectId = getProjectIdFromForm(form);
+    form.reset();
+    if (projectId) {
+      const projectSelect = form.querySelector('select[id$="ProjectSelect"]');
+      if (projectSelect) projectSelect.value = projectId;
+      await loadAndRenderProjectProduction(projectId);
+    }
+    showToast("Saved successfully.");
+  }
   catch (error) { console.error("Production workspace error:", error); handleApiError(error); }
   finally { submitButton.disabled = false; submitButton.textContent = originalText; }
+}
+
+function getProjectIdFromForm(form) {
+  return String(form.querySelector('select[id$="ProjectSelect"]')?.value || "").trim();
 }
 
 async function handleAddVisual(event) {
@@ -1029,17 +1097,115 @@ async function handleAddEditBlueprint(event) {
   }));
 }
 
-async function loadScriptSourceOptions(event) {
+async function handleProductionProjectSelection(event) {
   const projectId = String(event.target.value || "").trim();
+  syncProjectSelectors(projectId, event.target.id);
   populateSourceSelect("scriptSourceIds", []);
-  if (!projectId || !CreatorAPI.hasAdminToken()) return;
+  if (!projectId || !CreatorAPI.hasAdminToken()) {
+    renderProductionWorkspace(createEmptyProductionState());
+    return;
+  }
   try {
-    const response = await CreatorAPI.getProjectResearch(projectId);
-    populateSourceSelect("scriptSourceIds", response.sources || []);
+    const [researchResponse] = await Promise.all([
+      CreatorAPI.getProjectResearch(projectId),
+      loadAndRenderProjectProduction(projectId)
+    ]);
+    populateSourceSelect("scriptSourceIds", researchResponse.sources || []);
   } catch (error) {
-    console.error("Load script sources error:", error);
+    console.error("Load production workspace error:", error);
     handleApiError(error);
   }
+}
+
+function syncProjectSelectors(projectId, sourceSelectId = "") {
+  ["scriptProjectSelect", "visualProjectSelect", "editProjectSelect", "publishingProjectSelect"]
+    .forEach(selectId => {
+      if (selectId === sourceSelectId) return;
+      const select = document.getElementById(selectId);
+      if (select && Array.from(select.options).some(option => option.value === projectId)) {
+        select.value = projectId;
+      }
+    });
+}
+
+async function loadAndRenderProjectProduction(projectId) {
+  const response = await CreatorAPI.getProjectProduction(projectId);
+  currentProjectProduction = normalizeProductionResponse(response);
+  renderProductionWorkspace(currentProjectProduction);
+  return currentProjectProduction;
+}
+
+function normalizeProductionResponse(response = {}) {
+  const firstArray = (...keys) => {
+    const value = keys.map(key => response[key]).find(Array.isArray);
+    return value || [];
+  };
+
+  return {
+    claims: firstArray("claims"),
+    angles: firstArray("angles", "storyAngles"),
+    scripts: firstArray("scripts", "scriptSections"),
+    visuals: firstArray("visuals", "visualPlan"),
+    editBlueprints: firstArray("editBlueprints", "editing", "edits"),
+    publishingPackages: firstArray("publishingPackages", "publishing", "packages")
+  };
+}
+
+function renderProductionWorkspace(production) {
+  renderProductionList("claimsList", production.claims, item => ({
+    title: item.claimText || item.claim || "Untitled claim",
+    meta: [item.verificationStatus, item.supportLevel, item.claimType]
+  }));
+  renderProductionList("anglesList", production.angles, item => ({
+    title: item.angleTitle || item.title || "Untitled angle",
+    meta: [item.evidenceStrength, item.storyPotential],
+    detail: item.audiencePromise || item.centralQuestion
+  }));
+  renderProductionList("scriptSectionsList", production.scripts, item => ({
+    title: item.sectionName || item.title || "Untitled script section",
+    meta: [item.status, item.startTime && item.endTime ? `${item.startTime}–${item.endTime}` : item.startTime],
+    detail: item.narration
+  }));
+  renderProductionList("visualPlanList", production.visuals, item => ({
+    title: item.description || "Untitled visual",
+    meta: [item.visualType, item.estimatedDuration],
+    detail: item.onScreenText
+  }));
+  renderProductionList("editBlueprintList", production.editBlueprints, item => ({
+    title: item.editingNotes || item.notes || "Untitled edit beat",
+    meta: [item.startTime && item.endTime ? `${item.startTime}–${item.endTime}` : item.startTime],
+    detail: item.bRoll || item.graphics
+  }));
+  renderProductionList("publishingPackagesList", production.publishingPackages, item => ({
+    title: item.selectedTitle || item.title || "Untitled publishing package",
+    meta: [item.status],
+    detail: item.selectedThumbnail || item.description
+  }));
+}
+
+function renderProductionList(elementId, items, describeItem) {
+  const list = document.getElementById(elementId);
+  if (!list) return;
+  if (!Array.isArray(items) || items.length === 0) {
+    list.innerHTML = '<p class="muted-copy">No saved items for this project yet.</p>';
+    return;
+  }
+
+  list.innerHTML = items.map(item => {
+    const description = describeItem(item);
+    const meta = (description.meta || []).filter(Boolean).map(value => escapeHTML(formatLabel(value))).join(" · ");
+    const detail = description.detail
+      ? `<p>${escapeHTML(truncateText(description.detail, 320))}</p>`
+      : "";
+    return `<article class="research-item production-item"><div><h4>${escapeHTML(description.title)}</h4>${detail}<small>${meta || "Saved item"}</small></div></article>`;
+  }).join("");
+}
+
+function truncateText(value, maximumLength) {
+  const text = String(value || "").trim();
+  return text.length > maximumLength
+    ? `${text.slice(0, maximumLength - 1).trim()}…`
+    : text;
 }
 
 
@@ -1121,9 +1287,16 @@ async function handleResearchProjectSelection(
   }
 
 
-  await loadProjectResearch(
-    projectId
-  );
+  try {
+    await Promise.all([
+      loadProjectResearch(projectId),
+      loadAndRenderProjectProduction(projectId)
+    ]);
+  }
+  catch (error) {
+    console.error("Load selected project error:", error);
+    handleApiError(error);
+  }
 
 }
 
@@ -1220,8 +1393,8 @@ function populateSourceSelect(selectId, sources) {
   });
 }
 
-function renderSourceList(sources) {
-  const list = document.getElementById("sourcesList");
+function renderSourceList(sources, listId = "sourcesList") {
+  const list = document.getElementById(listId);
   if (!list) return;
   if (!sources.length) {
     list.innerHTML = '<p class="muted-copy">No sources have been saved for this project.</p>';
@@ -1636,6 +1809,7 @@ async function handleAddClaim(event) {
       contradictionGroupId: String(document.getElementById("contradictionGroupId")?.value || "").trim()
     });
     form.reset();
+    await loadAndRenderProjectProduction(projectId);
     showToast("Claim saved successfully.");
   } catch (error) {
     console.error("Add claim error:", error);
@@ -1675,6 +1849,7 @@ async function handleAddAngle(event) {
       evidenceStrength: document.getElementById("angleEvidenceStrength")?.value || "moderate"
     });
     form.reset();
+    await loadAndRenderProjectProduction(projectId);
     showToast("Story angle saved successfully.");
   } catch (error) {
     console.error("Add angle error:", error);
@@ -1719,7 +1894,10 @@ async function handleAddScriptSection(event) {
     });
     form.reset();
     document.getElementById("scriptSectionOrder").value = "1";
-    populateSourceSelect("scriptSourceIds", []);
+    document.getElementById("scriptProjectSelect").value = projectId;
+    const researchResponse = await CreatorAPI.getProjectResearch(projectId);
+    populateSourceSelect("scriptSourceIds", researchResponse.sources || []);
+    await loadAndRenderProjectProduction(projectId);
     showToast("Script section saved successfully.");
   } catch (error) {
     console.error("Add script section error:", error);
@@ -1752,6 +1930,9 @@ async function handleProjectCreation(
 ) {
 
   event.preventDefault();
+
+  const form =
+    event.currentTarget;
 
 
   if (!CreatorAPI.hasAdminToken()) {
