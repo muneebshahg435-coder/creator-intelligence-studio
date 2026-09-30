@@ -40,7 +40,7 @@ const APP_CONFIG = Object.freeze({
   */
 
   apiBaseUrl:
-    "https://script.google.com/macros/s/AKfycbzSvWHpC7EWOWqAyQFv07vaICUpDgaBdLFu0SWgi9Jgin2nF8B8ZMUOlywP8rO3dJNxYw/exec",
+    "https://creator-intelligence-cors-c03d.muneebshahg435.workers.dev/",
 
   sessionKeys: Object.freeze({
 
