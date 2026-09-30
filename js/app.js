@@ -1352,9 +1352,18 @@ async function loadProjects() {
       await CreatorAPI.listProjects();
 
 
-    renderProjects(
-      response.projects || []
-    );
+    const projects =
+  response.projects || [];
+
+
+renderProjects(
+  projects
+);
+
+
+populateResearchProjectSelect(
+  projects
+);
 
   } catch (error) {
 
