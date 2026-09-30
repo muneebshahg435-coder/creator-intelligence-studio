@@ -19,7 +19,7 @@ const APP_CONFIG = Object.freeze({
 
   appName: "Creator Intelligence Studio",
 
-  version: "v0.2.0",
+  version: "v0.3.0",
 
   environment: "production",
 
@@ -51,7 +51,9 @@ const APP_CONFIG = Object.freeze({
 
   limits: Object.freeze({
 
-    projectInputMaxLength: 5000
+    projectInputMaxLength: 5000,
+
+    requestTimeoutMs: 20000
 
   })
 

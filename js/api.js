@@ -135,7 +135,7 @@ const CreatorAPI = (() => {
 
 
     const response =
-      await fetch(
+      await fetchWithTimeout_(
         url.toString(),
         {
           method: "GET",
@@ -183,44 +183,60 @@ const CreatorAPI = (() => {
     }
 
 
+    const requestId =
+      createRequestId_();
+
+
     const requestBody = {
 
       action,
 
       adminToken,
 
+      requestId,
+
+      clientVersion:
+        APP_CONFIG.version,
+
       payload
 
     };
 
 
-    const response =
-      await fetch(
-        APP_CONFIG.apiBaseUrl,
-        {
-          method: "POST",
+    let data;
 
-          redirect: "follow",
+    try {
+      const response =
+        await fetchWithTimeout_(
+          APP_CONFIG.apiBaseUrl,
+          {
+            method: "POST",
 
-          cache: "no-store",
+            redirect: "follow",
 
-          headers: {
-            "Content-Type":
-              "text/plain;charset=utf-8"
-          },
+            cache: "no-store",
 
-          body:
-            JSON.stringify(
-              requestBody
-            )
-        }
-      );
+            headers: {
+              "Content-Type":
+                "text/plain;charset=utf-8"
+            },
 
+            body:
+              JSON.stringify(
+                requestBody
+              )
+          }
+        );
 
-    const data =
-      await parseResponse_(
-        response
-      );
+      data =
+        await parseResponse_(
+          response
+        );
+    }
+    catch (error) {
+      error.requestId = requestId;
+      throw error;
+    }
 
 
     if (!data.success) {
@@ -236,6 +252,10 @@ const CreatorAPI = (() => {
         data.error ||
         "API_ERROR";
 
+      error.requestId =
+        data.requestId ||
+        requestId;
+
 
       throw error;
 
@@ -243,6 +263,68 @@ const CreatorAPI = (() => {
 
 
     return data;
+
+  }
+
+
+  function createRequestId_() {
+
+    if (
+      globalThis.crypto &&
+      typeof globalThis.crypto.randomUUID === "function"
+    ) {
+      return globalThis.crypto.randomUUID();
+    }
+
+    return (
+      `cis-${Date.now()}-` +
+      Math.random().toString(36).slice(2, 10)
+    );
+
+  }
+
+
+  async function fetchWithTimeout_(
+    url,
+    options = {}
+  ) {
+
+    const controller =
+      new AbortController();
+
+    const timeout =
+      setTimeout(
+        () => controller.abort(),
+        APP_CONFIG.limits.requestTimeoutMs
+      );
+
+    try {
+      return await fetch(
+        url,
+        {
+          ...options,
+          signal: controller.signal
+        }
+      );
+    }
+    catch (error) {
+      if (error.name === "AbortError") {
+        const timeoutError =
+          new Error(
+            "The backend took too long to respond. Please try again."
+          );
+
+        timeoutError.code =
+          "REQUEST_TIMEOUT";
+
+        throw timeoutError;
+      }
+
+      throw error;
+    }
+    finally {
+      clearTimeout(timeout);
+    }
 
   }
 
@@ -322,6 +404,32 @@ async function getProjectResearch(
   );
 
 } 
+
+async function getProjectProduction(projectId) {
+  return request("getProjectProduction", { projectId });
+}
+
+async function addClaim(claimData) {
+  return request("addClaim", claimData);
+}
+
+async function addAngle(angleData) {
+  return request("addAngle", angleData);
+}
+
+async function addScriptSection(scriptData) {
+  return request("addScriptSection", scriptData);
+}
+
+async function addVisual(visualData) { return request("addVisual", visualData); }
+
+async function addEditBlueprint(editData) { return request("addEditBlueprint", editData); }
+
+async function addPublishingPackage(packageData) { return request("addPublishing", packageData); }
+
+async function updateProjectStatus(projectId, status) {
+  return request("updateProjectStatus", { projectId, status });
+}
 
 
   /* =====================================================
@@ -403,7 +511,23 @@ async function getProjectResearch(
 
     addResearchFinding,
 
-    getProjectResearch
+    getProjectResearch,
+
+    getProjectProduction,
+
+    addClaim,
+
+    addAngle,
+
+    addScriptSection,
+
+    addVisual,
+
+    addEditBlueprint,
+
+    addPublishingPackage,
+
+    updateProjectStatus
 
   });
 
