@@ -375,35 +375,36 @@ async function getProjectResearch(
 
   }
 
+/* =====================================================
+   PUBLIC INTERFACE
+===================================================== */
 
-  /* =====================================================
-     PUBLIC INTERFACE
-  ===================================================== */
+  return Object.freeze({
 
- return Object.freeze({
+    isConfigured,
 
-  isConfigured,
+    healthCheck,
 
-  healthCheck,
+    saveAdminToken,
 
-  saveAdminToken,
+    getAdminToken,
 
-  getAdminToken,
+    hasAdminToken,
 
-  hasAdminToken,
+    clearAdminToken,
 
-  clearAdminToken,
+    createProject,
 
-  createProject,
+    listProjects,
 
-  listProjects,
+    getProject,
 
-  getProject,
+    addSource,
 
-  addSource,
+    addResearchFinding,
 
-  addResearchFinding,
+    getProjectResearch
 
-  getProjectResearch
+  });
 
-});
+})();
