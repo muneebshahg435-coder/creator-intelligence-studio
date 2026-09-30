@@ -335,6 +335,10 @@ async function addAngle(angleData) {
   return request("addAngle", angleData);
 }
 
+async function addScriptSection(scriptData) {
+  return request("addScriptSection", scriptData);
+}
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -421,7 +425,9 @@ async function addAngle(angleData) {
 
     addClaim,
 
-    addAngle
+    addAngle,
+
+    addScriptSection
 
   });
 

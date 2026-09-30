@@ -1169,13 +1169,23 @@
         class="page-section placeholder-section"
         id="scriptsSection"
       >
-        <div class="placeholder-card">
-          <span>SCRIPTS</span>
-          <h2>Script Workspace</h2>
-          <p>
-            Hooks, outlines, narration and citations will be managed here.
-          </p>
-        </div>
+        <section class="panel research-entry-panel">
+          <div class="panel-header"><div><span class="section-kicker">EVIDENCE-LINKED SCRIPT</span><h2>Script Workspace</h2><p>Write in sections and keep the evidence, visual direction, and edit plan together.</p></div></div>
+          <form id="scriptSectionForm">
+            <div class="form-group"><label for="scriptProjectSelect">Project</label><select id="scriptProjectSelect" required><option value="">Choose a project...</option></select></div>
+            <div class="form-grid">
+              <div class="form-group"><label for="scriptSectionOrder">Section order</label><input class="text-input" id="scriptSectionOrder" type="number" min="1" value="1" required></div>
+              <div class="form-group"><label for="scriptSectionName">Section name</label><input class="text-input" id="scriptSectionName" maxlength="160" placeholder="Hook, context, turning point..." required></div>
+              <div class="form-group"><label for="scriptStartTime">Start time</label><input class="text-input" id="scriptStartTime" maxlength="20" placeholder="00:00"></div>
+              <div class="form-group"><label for="scriptEndTime">End time</label><input class="text-input" id="scriptEndTime" maxlength="20" placeholder="00:30"></div>
+              <div class="form-group"><label for="scriptStatus">Production status</label><select id="scriptStatus"><option value="draft">Draft</option><option value="review">In review</option><option value="approved">Approved</option><option value="recorded">Recorded</option></select></div>
+              <div class="form-group"><label for="scriptSourceIds">Supporting sources</label><select id="scriptSourceIds" multiple size="4"></select></div>
+            </div>
+            <div class="form-group"><label for="scriptNarration">Narration</label><textarea class="text-input" id="scriptNarration" rows="8" maxlength="12000" placeholder="Write the spoken narration for this section..." required></textarea></div>
+            <div class="form-grid"><div class="form-group"><label for="scriptVisualNotes">Visual notes</label><textarea class="text-input" id="scriptVisualNotes" rows="4" maxlength="4000" placeholder="B-roll, maps, charts, screenshots, graphics..."></textarea></div><div class="form-group"><label for="scriptEditNotes">Editing notes</label><textarea class="text-input" id="scriptEditNotes" rows="4" maxlength="4000" placeholder="Pacing, cuts, sound design, emphasis..."></textarea></div></div>
+            <div class="create-actions"><div class="create-note"><span>✓</span>Save only material you can support with the linked evidence.</div><button class="primary-button" type="submit">Save Script Section</button></div>
+          </form>
+        </section>
       </section>
 
 

@@ -38,6 +38,8 @@ async function initializeApplication() {
 
   setupResearchWorkspace();
 
+  setupScriptWorkspace();
+
   await checkBackendHealth();
 
   updateAuthenticationUI();
@@ -928,6 +930,36 @@ function populateResearchProjectSelect(
     }
   );
 
+  populateScriptProjectSelect(researchProjectsCache);
+
+}
+
+function populateScriptProjectSelect(projects) {
+  const select = document.getElementById("scriptProjectSelect");
+  if (!select) return;
+  select.innerHTML = '<option value="">Choose a project...</option>';
+  projects.forEach(project => {
+    select.add(new Option(project.title || project.projectId, project.projectId));
+  });
+}
+
+function setupScriptWorkspace() {
+  const projectSelect = document.getElementById("scriptProjectSelect");
+  projectSelect?.addEventListener("change", loadScriptSourceOptions);
+  document.getElementById("scriptSectionForm")?.addEventListener("submit", handleAddScriptSection);
+}
+
+async function loadScriptSourceOptions(event) {
+  const projectId = String(event.target.value || "").trim();
+  populateSourceSelect("scriptSourceIds", []);
+  if (!projectId || !CreatorAPI.hasAdminToken()) return;
+  try {
+    const response = await CreatorAPI.getProjectResearch(projectId);
+    populateSourceSelect("scriptSourceIds", response.sources || []);
+  } catch (error) {
+    console.error("Load script sources error:", error);
+    handleApiError(error);
+  }
 }
 
 
@@ -1512,6 +1544,51 @@ async function handleAddAngle(event) {
     showToast("Story angle saved successfully.");
   } catch (error) {
     console.error("Add angle error:", error);
+    handleApiError(error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+}
+
+async function handleAddScriptSection(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("scriptProjectSelect")?.value || "").trim();
+  const sectionName = String(document.getElementById("scriptSectionName")?.value || "").trim();
+  const narration = String(document.getElementById("scriptNarration")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) {
+    showToast("Connect your Admin Session first.");
+    openAdminModal();
+    return;
+  }
+  if (!projectId || !sectionName || !narration) {
+    showToast("Choose a project and complete the section name and narration.");
+    return;
+  }
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving Section...";
+  try {
+    await CreatorAPI.addScriptSection({
+      projectId,
+      sectionOrder: Number(document.getElementById("scriptSectionOrder")?.value || 1),
+      sectionName,
+      startTime: String(document.getElementById("scriptStartTime")?.value || "").trim(),
+      endTime: String(document.getElementById("scriptEndTime")?.value || "").trim(),
+      narration,
+      sourceIds: Array.from(document.getElementById("scriptSourceIds")?.selectedOptions || []).map(option => option.value).filter(Boolean),
+      visualNotes: String(document.getElementById("scriptVisualNotes")?.value || "").trim(),
+      editNotes: String(document.getElementById("scriptEditNotes")?.value || "").trim(),
+      status: document.getElementById("scriptStatus")?.value || "draft"
+    });
+    form.reset();
+    document.getElementById("scriptSectionOrder").value = "1";
+    populateSourceSelect("scriptSourceIds", []);
+    showToast("Script section saved successfully.");
+  } catch (error) {
+    console.error("Add script section error:", error);
     handleApiError(error);
   } finally {
     submitButton.disabled = false;
