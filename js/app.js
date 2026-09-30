@@ -825,6 +825,280 @@ function updateCharacterCounter() {
 
 }
 
+/* =====================================================
+   RESEARCH WORKSPACE
+===================================================== */
+
+let researchProjectsCache = [];
+
+
+function setupResearchWorkspace() {
+
+  const projectSelect =
+    document.getElementById(
+      "researchProjectSelect"
+    );
+
+
+  if (!projectSelect) {
+    return;
+  }
+
+
+  projectSelect.addEventListener(
+    "change",
+    handleResearchProjectSelection
+  );
+
+}
+
+
+function populateResearchProjectSelect(
+  projects
+) {
+
+  const projectSelect =
+    document.getElementById(
+      "researchProjectSelect"
+    );
+
+
+  if (!projectSelect) {
+    return;
+  }
+
+
+  researchProjectsCache =
+    Array.isArray(projects)
+      ? projects
+      : [];
+
+
+  projectSelect.innerHTML = `
+    <option value="">
+      Choose a project...
+    </option>
+  `;
+
+
+  researchProjectsCache.forEach(
+    project => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+
+      option.value =
+        project.projectId;
+
+
+      option.textContent =
+        project.title ||
+        project.projectId;
+
+
+      projectSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+}
+
+
+async function handleResearchProjectSelection(
+  event
+) {
+
+  const projectId =
+    event.target.value;
+
+
+  const workspace =
+    document.getElementById(
+      "researchWorkspace"
+    );
+
+
+  if (!projectId) {
+
+    if (workspace) {
+      workspace.hidden = true;
+    }
+
+    return;
+
+  }
+
+
+  const project =
+    researchProjectsCache.find(
+      item =>
+        item.projectId ===
+        projectId
+    );
+
+
+  if (project) {
+
+    const title =
+      document.getElementById(
+        "researchProjectTitle"
+      );
+
+    const meta =
+      document.getElementById(
+        "researchProjectMeta"
+      );
+
+
+    if (title) {
+
+      title.textContent =
+        project.title ||
+        "Project Research";
+
+    }
+
+
+    if (meta) {
+
+      meta.textContent =
+        `${formatLabel(
+          project.videoType
+        )} · ${formatLength(
+          project.targetLength
+        )} · ${formatLabel(
+          project.researchDepth
+        )}`;
+
+    }
+
+  }
+
+
+  if (workspace) {
+
+    workspace.hidden = false;
+
+  }
+
+
+  await loadProjectResearch(
+    projectId
+  );
+
+}
+
+
+async function loadProjectResearch(
+  projectId
+) {
+
+  try {
+
+    const response =
+      await CreatorAPI
+        .getProjectResearch(
+          projectId
+        );
+
+
+    const sources =
+      response.sources || [];
+
+
+    const research =
+      response.research || [];
+
+
+    const verifiedCount =
+      research.filter(
+        item =>
+          item.verificationStatus ===
+          "verified"
+      ).length;
+
+
+    updateResearchSummary(
+      sources.length,
+      research.length,
+      verifiedCount
+    );
+
+  }
+  catch (error) {
+
+    console.error(
+      "Load project research error:",
+      error
+    );
+
+
+    handleApiError(error);
+
+  }
+
+}
+
+
+function updateResearchSummary(
+  sourceCount,
+  researchCount,
+  verifiedCount
+) {
+
+  const sourceElement =
+    document.getElementById(
+      "sourceCount"
+    );
+
+  const researchElement =
+    document.getElementById(
+      "researchCount"
+    );
+
+  const verifiedElement =
+    document.getElementById(
+      "verifiedCount"
+    );
+
+
+  if (sourceElement) {
+
+    sourceElement.textContent =
+      `${sourceCount} ${
+        sourceCount === 1
+          ? "Source"
+          : "Sources"
+      }`;
+
+  }
+
+
+  if (researchElement) {
+
+    researchElement.textContent =
+      `${researchCount} ${
+        researchCount === 1
+          ? "Finding"
+          : "Findings"
+      }`;
+
+  }
+
+
+  if (verifiedElement) {
+
+    verifiedElement.textContent =
+      `${verifiedCount} Verified`;
+
+  }
+
+}
 
 /* =====================================================
    PROJECT CREATION
