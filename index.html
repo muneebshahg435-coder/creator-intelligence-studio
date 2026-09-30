@@ -820,7 +820,223 @@
       </article>
 
     </div>
+<section class="panel research-entry-panel">
 
+  <div class="panel-header">
+
+    <div>
+      <span class="section-kicker">
+        SOURCE ENTRY
+      </span>
+
+      <h3>Add Research Source</h3>
+
+      <p>
+        Add a source manually to verify the research pipeline.
+      </p>
+    </div>
+
+  </div>
+
+
+  <form id="sourceForm">
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="sourceUrl">
+          Source URL
+        </label>
+
+        <input
+          class="text-input"
+          id="sourceUrl"
+          type="url"
+          placeholder="https://example.com/article"
+          required
+        >
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourceTitle">
+          Source Title
+        </label>
+
+        <input
+          class="text-input"
+          id="sourceTitle"
+          type="text"
+          placeholder="Article or document title"
+        >
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourcePublisher">
+          Publisher
+        </label>
+
+        <input
+          class="text-input"
+          id="sourcePublisher"
+          type="text"
+          placeholder="Reuters, Government website, etc."
+        >
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourceAuthor">
+          Author
+        </label>
+
+        <input
+          class="text-input"
+          id="sourceAuthor"
+          type="text"
+          placeholder="Author name"
+        >
+      </div>
+
+    </div>
+
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label for="sourceType">
+          Source Type
+        </label>
+
+        <select id="sourceType">
+
+          <option value="web">
+            Web Article
+          </option>
+
+          <option value="government">
+            Government / Official
+          </option>
+
+          <option value="report">
+            Report
+          </option>
+
+          <option value="research-paper">
+            Research Paper
+          </option>
+
+          <option value="dataset">
+            Dataset
+          </option>
+
+          <option value="interview">
+            Interview
+          </option>
+
+        </select>
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourceTier">
+          Source Tier
+        </label>
+
+        <select id="sourceTier">
+
+          <option value="">
+            Not classified
+          </option>
+
+          <option value="tier-1">
+            Tier 1 — Primary / Authoritative
+          </option>
+
+          <option value="tier-2">
+            Tier 2 — High-quality reporting
+          </option>
+
+          <option value="tier-3">
+            Tier 3 — Supporting context
+          </option>
+
+        </select>
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourceReliability">
+          Reliability Label
+        </label>
+
+        <select id="sourceReliability">
+
+          <option value="">
+            Not reviewed
+          </option>
+
+          <option value="authoritative">
+            Authoritative
+          </option>
+
+          <option value="reliable">
+            Reliable
+          </option>
+
+          <option value="supporting">
+            Supporting
+          </option>
+
+          <option value="needs-verification">
+            Needs Verification
+          </option>
+
+        </select>
+      </div>
+
+
+      <div class="form-group">
+        <label for="sourcePrimary">
+          Primary Source?
+        </label>
+
+        <select id="sourcePrimary">
+
+          <option value="false">
+            No
+          </option>
+
+          <option value="true">
+            Yes
+          </option>
+
+        </select>
+      </div>
+
+    </div>
+
+
+    <div class="create-actions">
+
+      <div class="create-note">
+        <span>✓</span>
+        Source will be linked to the selected project.
+      </div>
+
+      <button
+        class="primary-button"
+        type="submit"
+      >
+        Add Source
+      </button>
+
+    </div>
+
+  </form>
+
+</section>
   </section>
 
 </section>
