@@ -36,6 +36,17 @@ test("static DOM lookups point to existing elements", () => {
   assert.deepEqual([...new Set(references.filter(id => !htmlIdSet.has(id)))], []);
 });
 
+test("every navigation item resolves to a page section", () => {
+  const navigationSections = [...files.html.matchAll(/data-section="([^"]+)"/g)]
+    .map(match => match[1]);
+  const aliases = { projects: "dashboardSection" };
+  const missing = navigationSections.filter(section => {
+    const targetId = aliases[section] || `${section}Section`;
+    return !htmlIdSet.has(targetId);
+  });
+  assert.deepEqual(missing, []);
+});
+
 test("production result panels are present", () => {
   const required = [
     "claimsList",

@@ -568,9 +568,15 @@ function showSection(
   );
 
 
+  const targetId =
+    sectionName === "projects"
+      ? "dashboardSection"
+      : `${sectionName}Section`;
+
+
   const target =
     document.getElementById(
-      `${sectionName}Section`
+      targetId
     );
 
 
@@ -593,6 +599,16 @@ function showSection(
   updatePageHeader(
     sectionName
   );
+
+
+  if (sectionName === "projects") {
+    setTimeout(
+      scrollToProjects,
+      100
+    );
+
+    return;
+  }
 
 
   window.scrollTo({
