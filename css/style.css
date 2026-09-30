@@ -1534,3 +1534,321 @@ select:focus {
   }
 
 }
+/* =========================================================
+   PHASE 3C
+   BACKEND + ADMIN AUTHENTICATION
+========================================================= */
+
+
+/* =========================
+   BACKEND STATUS
+========================= */
+
+.status-button {
+  border: 0;
+  background: transparent;
+
+  padding: 8px 10px;
+
+  border-radius: 8px;
+
+  transition: var(--transition);
+}
+
+
+.status-button:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+
+.status-checking {
+  background: var(--warning);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(251, 191, 36, 0.08);
+}
+
+
+.status-online {
+  background: var(--success);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(52, 211, 153, 0.08);
+}
+
+
+.status-offline {
+  background: var(--danger);
+
+  box-shadow:
+    0 0 0 4px
+    rgba(251, 113, 133, 0.08);
+}
+
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+
+  z-index: 5000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background: rgba(3, 6, 12, 0.78);
+
+  backdrop-filter: blur(8px);
+
+  opacity: 0;
+  visibility: hidden;
+
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s ease;
+}
+
+
+.modal-backdrop.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+.modal-card {
+  width: 100%;
+  max-width: 470px;
+
+  padding: 26px;
+
+  border: 1px solid var(--border-light);
+
+  border-radius: var(--radius-medium);
+
+  background:
+    linear-gradient(
+      145deg,
+      #121925,
+      #0c1119
+    );
+
+  box-shadow:
+    0 30px 90px
+    rgba(0, 0, 0, 0.55);
+
+  transform: translateY(10px);
+
+  transition: transform 0.2s ease;
+}
+
+
+.modal-backdrop.show .modal-card {
+  transform: translateY(0);
+}
+
+
+.modal-header {
+  display: flex;
+
+  align-items: flex-start;
+
+  justify-content: space-between;
+
+  gap: 20px;
+}
+
+
+.modal-header h3 {
+  margin-top: 7px;
+
+  font-size: 20px;
+}
+
+
+.modal-close {
+  width: 37px;
+  height: 37px;
+
+  flex-shrink: 0;
+
+  border: 1px solid var(--border);
+
+  border-radius: 9px;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: var(--text-secondary);
+
+  font-size: 22px;
+
+  line-height: 1;
+}
+
+
+.modal-close:hover {
+  color: var(--text-primary);
+
+  border-color: var(--border-light);
+}
+
+
+.modal-description {
+  margin-top: 18px;
+
+  color: var(--text-secondary);
+
+  font-size: 12px;
+
+  line-height: 1.7;
+}
+
+
+.modal-card form {
+  margin-top: 22px;
+}
+
+
+/* =========================
+   TEXT INPUT
+========================= */
+
+.text-input {
+  width: 100%;
+
+  min-height: 46px;
+
+  padding: 0 13px;
+
+  border: 1px solid var(--border-light);
+
+  border-radius: 10px;
+
+  background: #0b1018;
+
+  color: var(--text-primary);
+
+  transition: var(--transition);
+}
+
+
+.text-input:focus {
+  border-color: var(--accent);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(91, 140, 255, 0.08);
+}
+
+
+.text-input::placeholder {
+  color: #596477;
+}
+
+
+/* =========================
+   SECURITY NOTE
+========================= */
+
+.token-security-note {
+  margin-top: 13px;
+
+  padding: 12px;
+
+  border:
+    1px solid
+    rgba(251, 191, 36, 0.15);
+
+  border-radius: 9px;
+
+  background:
+    rgba(251, 191, 36, 0.04);
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+.token-security-note strong {
+  color: var(--warning);
+
+  font-size: 10px;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.8px;
+}
+
+
+.token-security-note span {
+  color: var(--text-secondary);
+
+  font-size: 10px;
+}
+
+
+.modal-actions {
+  margin-top: 22px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+
+/* =========================
+   LOADING BUTTON
+========================= */
+
+button:disabled {
+  cursor: not-allowed;
+
+  opacity: 0.55;
+
+  transform: none !important;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 650px) {
+
+  #adminAccessButton {
+    font-size: 10px;
+
+    padding: 8px 10px;
+  }
+
+
+  .modal-card {
+    padding: 22px 18px;
+  }
+
+
+  .modal-actions {
+    flex-direction: column-reverse;
+
+    align-items: stretch;
+  }
+
+
+  .modal-actions button {
+    width: 100%;
+  }
+
+}
