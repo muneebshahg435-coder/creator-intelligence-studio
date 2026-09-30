@@ -323,6 +323,14 @@ async function getProjectResearch(
 
 } 
 
+async function getProjectProduction(projectId) {
+  return request("getProjectProduction", { projectId });
+}
+
+async function addClaim(claimData) {
+  return request("addClaim", claimData);
+}
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -403,7 +411,11 @@ async function getProjectResearch(
 
     addResearchFinding,
 
-    getProjectResearch
+    getProjectResearch,
+
+    getProjectProduction,
+
+    addClaim
 
   });
 

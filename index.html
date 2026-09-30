@@ -1076,6 +1076,49 @@
       </form>
     </section>
 
+    <section class="panel research-entry-panel">
+      <div class="panel-header">
+        <div>
+          <span class="section-kicker">CLAIM REVIEW</span>
+          <h3>Track a Verifiable Claim</h3>
+          <p>Keep disputed evidence visible and group claims that contradict each other.</p>
+        </div>
+      </div>
+      <form id="claimForm">
+        <div class="form-group">
+          <label for="claimText">Claim</label>
+          <textarea class="text-input" id="claimText" rows="4" maxlength="5000" placeholder="Write one factual claim that a viewer could check." required></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="claimType">Claim type</label>
+            <input class="text-input" id="claimType" maxlength="80" placeholder="Statistic, timeline, attribution...">
+          </div>
+          <div class="form-group">
+            <label for="claimVerificationStatus">Verification state</label>
+            <select id="claimVerificationStatus"><option value="unverified">Unverified</option><option value="partially-verified">Partially verified</option><option value="verified">Verified</option><option value="disputed">Disputed</option><option value="outdated">Outdated</option></select>
+          </div>
+          <div class="form-group">
+            <label for="claimSupportLevel">Evidence strength</label>
+            <select id="claimSupportLevel"><option value="none">No evidence linked</option><option value="weak">Weak</option><option value="moderate">Moderate</option><option value="strong">Strong</option></select>
+          </div>
+          <div class="form-group">
+            <label for="claimSourceIds">Supporting sources</label>
+            <select id="claimSourceIds" multiple size="4"></select>
+          </div>
+          <div class="form-group">
+            <label for="contradictionGroupId">Contradiction group</label>
+            <input class="text-input" id="contradictionGroupId" maxlength="100" placeholder="Optional shared label, e.g. budget-2026">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="claimEvidenceSummary">Evidence summary</label>
+          <textarea class="text-input" id="claimEvidenceSummary" rows="3" maxlength="5000" placeholder="Explain which evidence supports or disputes this claim."></textarea>
+        </div>
+        <div class="create-actions"><div class="create-note"><span>✓</span>Only verified claims should move into the final script.</div><button class="primary-button" type="submit">Save Claim</button></div>
+      </form>
+    </section>
+
     <section class="research-results-grid" aria-live="polite">
       <section class="panel research-list-panel">
         <div class="panel-header"><div><span class="section-kicker">EVIDENCE</span><h3>Sources</h3></div></div>

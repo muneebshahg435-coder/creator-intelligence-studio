@@ -865,6 +865,10 @@ function setupResearchWorkspace() {
     .getElementById("researchFindingForm")
     ?.addEventListener("submit", handleAddResearchFinding);
 
+  document
+    .getElementById("claimForm")
+    ?.addEventListener("submit", handleAddClaim);
+
 }
 
 function populateResearchProjectSelect(
@@ -1067,7 +1071,12 @@ function renderResearchLists(sources, findings) {
 }
 
 function populateFindingSourceSelect(sources) {
-  const select = document.getElementById("researchSourceIds");
+  populateSourceSelect("researchSourceIds", sources);
+  populateSourceSelect("claimSourceIds", sources);
+}
+
+function populateSourceSelect(selectId, sources) {
+  const select = document.getElementById(selectId);
   if (!select) return;
 
   const selectedIds = new Set(
@@ -1420,6 +1429,46 @@ async function handleAddResearchFinding(event) {
     showToast("Finding added successfully.");
   } catch (error) {
     console.error("Add research finding error:", error);
+    handleApiError(error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+}
+
+async function handleAddClaim(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("researchProjectSelect")?.value || "").trim();
+  const claimText = String(document.getElementById("claimText")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) {
+    showToast("Connect your Admin Session first.");
+    openAdminModal();
+    return;
+  }
+  if (!projectId || !claimText) {
+    showToast("Select a project and enter a claim first.");
+    return;
+  }
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving Claim...";
+  try {
+    await CreatorAPI.addClaim({
+      projectId,
+      claimText,
+      claimType: String(document.getElementById("claimType")?.value || "").trim(),
+      verificationStatus: document.getElementById("claimVerificationStatus")?.value || "unverified",
+      supportLevel: document.getElementById("claimSupportLevel")?.value || "none",
+      supportingSourceIds: Array.from(document.getElementById("claimSourceIds")?.selectedOptions || []).map(option => option.value).filter(Boolean),
+      evidenceSummary: String(document.getElementById("claimEvidenceSummary")?.value || "").trim(),
+      contradictionGroupId: String(document.getElementById("contradictionGroupId")?.value || "").trim()
+    });
+    form.reset();
+    showToast("Claim saved successfully.");
+  } catch (error) {
+    console.error("Add claim error:", error);
     handleApiError(error);
   } finally {
     submitButton.disabled = false;
