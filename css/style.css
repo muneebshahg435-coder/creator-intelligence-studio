@@ -1027,6 +1027,28 @@ select:focus {
   gap: 12px;
 }
 
+.project-stage-control {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.project-stage-control label {
+  flex: 1;
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.project-stage-control select {
+  width: 100%;
+  margin-top: 6px;
+}
+
+.project-stage-button {
+  white-space: nowrap;
+}
+
 
 .project-status {
   padding: 5px 8px;
@@ -1827,6 +1849,15 @@ button:disabled {
 ========================= */
 
 @media (max-width: 650px) {
+
+  .project-stage-control {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .project-stage-button {
+    width: 100%;
+  }
 
   #adminAccessButton {
     font-size: 10px;

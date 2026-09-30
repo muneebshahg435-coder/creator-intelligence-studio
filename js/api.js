@@ -345,6 +345,10 @@ async function addEditBlueprint(editData) { return request("addEditBlueprint", e
 
 async function addPublishingPackage(packageData) { return request("addPublishing", packageData); }
 
+async function updateProjectStatus(projectId, status) {
+  return request("updateProjectStatus", { projectId, status });
+}
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -439,7 +443,9 @@ async function addPublishingPackage(packageData) { return request("addPublishing
 
     addEditBlueprint,
 
-    addPublishingPackage
+    addPublishingPackage,
+
+    updateProjectStatus
 
   });
 

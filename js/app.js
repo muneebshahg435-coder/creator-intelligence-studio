@@ -836,6 +836,7 @@ function updateCharacterCounter() {
 ===================================================== */
 
 let researchProjectsCache = [];
+let currentResearchSources = [];
 
 
 function setupResearchWorkspace() {
@@ -1138,6 +1139,8 @@ async function loadProjectResearch(
     const sources =
       response.sources || [];
 
+    currentResearchSources = sources;
+
 
     const research =
       response.research || [];
@@ -1265,6 +1268,18 @@ function safeHttpUrl(value) {
   }
 }
 
+function normalizeSourceUrl(value) {
+  const safeUrl = safeHttpUrl(value);
+  if (!safeUrl) return "";
+  const url = new URL(safeUrl);
+  url.hash = "";
+  url.hostname = url.hostname.toLowerCase();
+  if (url.pathname !== "/") {
+    url.pathname = url.pathname.replace(/\/$/, "");
+  }
+  return url.href;
+}
+
 
 function updateResearchSummary(
   sourceCount,
@@ -1381,6 +1396,16 @@ async function handleAddSource(event) {
 
     return;
 
+  }
+
+  const normalizedUrl = normalizeSourceUrl(url);
+  const isDuplicate = currentResearchSources.some(
+    source => normalizeSourceUrl(source.url) === normalizedUrl
+  );
+
+  if (isDuplicate) {
+    showToast("This source is already saved for the selected project.");
+    return;
   }
 
 
@@ -2089,8 +2114,7 @@ function createProjectCard(
       <span class="project-status">
 
         ${escapeHTML(
-          project.status ||
-          "Idea"
+          formatLabel(project.status || "idea")
         )}
 
       </span>
@@ -2107,7 +2131,38 @@ function createProjectCard(
 
     </div>
 
+    <div class="project-stage-control">
+      <label>
+        Workflow stage
+        <select class="project-stage-select">
+          ${["idea", "research", "verification", "angle", "scripting", "visuals", "editing", "packaging", "ready", "published", "archived"]
+            .map(status => `<option value="${status}" ${status === String(project.status || "idea").toLowerCase() ? "selected" : ""}>${escapeHTML(formatLabel(status))}</option>`)
+            .join("")}
+        </select>
+      </label>
+      <button class="secondary-button project-stage-button" type="button">Update Stage</button>
+    </div>
+
   `;
+
+  const stageButton = card.querySelector(".project-stage-button");
+  const stageSelect = card.querySelector(".project-stage-select");
+  stageButton.addEventListener("click", async () => {
+    const originalText = stageButton.textContent;
+    stageButton.disabled = true;
+    stageButton.textContent = "Updating...";
+    try {
+      await CreatorAPI.updateProjectStatus(project.projectId, stageSelect.value);
+      await loadProjects();
+      showToast("Project stage updated.");
+    } catch (error) {
+      console.error("Update project stage error:", error);
+      handleApiError(error);
+    } finally {
+      stageButton.disabled = false;
+      stageButton.textContent = originalText;
+    }
+  });
 
 
   return card;
