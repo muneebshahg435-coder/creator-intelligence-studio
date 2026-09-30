@@ -688,35 +688,143 @@
       <!-- =========================
            PLACEHOLDER SECTIONS
       ========================== -->
+    <section
+  class="page-section"
+  id="researchSection"
+>
 
-      <section
-        class="page-section placeholder-section"
-        id="projectsSection"
-      >
-        <div class="placeholder-card">
-          <span>PROJECTS</span>
-          <h2>Project Library</h2>
+  <section class="panel">
+
+    <div class="panel-header">
+
+      <div>
+        <span class="section-kicker">
+          RESEARCH ENGINE
+        </span>
+
+        <h3>
+          Project Research Workspace
+        </h3>
+
+        <p>
+          Select a project to manage its sources,
+          findings and verification status.
+        </p>
+      </div>
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label for="researchProjectSelect">
+        Select Project
+      </label>
+
+      <select id="researchProjectSelect">
+
+        <option value="">
+          Choose a project...
+        </option>
+
+      </select>
+
+    </div>
+
+  </section>
+
+
+  <section
+    class="panel"
+    id="researchWorkspace"
+    hidden
+  >
+
+    <div class="panel-header">
+
+      <div>
+
+        <span class="section-kicker">
+          ACTIVE PROJECT
+        </span>
+
+        <h3 id="researchProjectTitle">
+          Project Research
+        </h3>
+
+        <p id="researchProjectMeta">
+          Sources and findings will appear below.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <div class="research-summary-grid">
+
+      <article class="mini-panel">
+
+        <span class="mini-icon">
+          S
+        </span>
+
+        <div>
+          <strong id="sourceCount">
+            0 Sources
+          </strong>
+
           <p>
-            The complete project-management interface will be built
-            in a later phase.
+            Evidence references
           </p>
         </div>
-      </section>
+
+      </article>
 
 
-      <section
-        class="page-section placeholder-section"
-        id="researchSection"
-      >
-        <div class="placeholder-card">
-          <span>RESEARCH</span>
-          <h2>Research Engine</h2>
+      <article class="mini-panel">
+
+        <span class="mini-icon">
+          R
+        </span>
+
+        <div>
+          <strong id="researchCount">
+            0 Findings
+          </strong>
+
           <p>
-            Source discovery, evidence collection and topic analysis
-            will live here.
+            Research findings
           </p>
         </div>
-      </section>
+
+      </article>
+
+
+      <article class="mini-panel">
+
+        <span class="mini-icon">
+          V
+        </span>
+
+        <div>
+          <strong id="verifiedCount">
+            0 Verified
+          </strong>
+
+          <p>
+            Verified findings
+          </p>
+        </div>
+
+      </article>
+
+    </div>
+
+  </section>
+
+</section>
+
 
 
       <section
