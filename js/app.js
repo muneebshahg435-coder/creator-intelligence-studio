@@ -40,6 +40,8 @@ async function initializeApplication() {
 
   setupScriptWorkspace();
 
+  setupVisualWorkspace();
+
   await checkBackendHealth();
 
   updateAuthenticationUI();
@@ -935,11 +937,11 @@ function populateResearchProjectSelect(
 }
 
 function populateScriptProjectSelect(projects) {
-  const select = document.getElementById("scriptProjectSelect");
-  if (!select) return;
-  select.innerHTML = '<option value="">Choose a project...</option>';
-  projects.forEach(project => {
-    select.add(new Option(project.title || project.projectId, project.projectId));
+  ["scriptProjectSelect", "visualProjectSelect", "editProjectSelect"].forEach(selectId => {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.innerHTML = '<option value="">Choose a project...</option>';
+    projects.forEach(project => select.add(new Option(project.title || project.projectId, project.projectId)));
   });
 }
 
@@ -947,6 +949,57 @@ function setupScriptWorkspace() {
   const projectSelect = document.getElementById("scriptProjectSelect");
   projectSelect?.addEventListener("change", loadScriptSourceOptions);
   document.getElementById("scriptSectionForm")?.addEventListener("submit", handleAddScriptSection);
+}
+
+function setupVisualWorkspace() {
+  document.getElementById("visualForm")?.addEventListener("submit", handleAddVisual);
+  document.getElementById("editBlueprintForm")?.addEventListener("submit", handleAddEditBlueprint);
+}
+
+async function submitProductionForm(form, buttonLabel, task) {
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = buttonLabel;
+  try { await task(); form.reset(); showToast("Saved successfully."); }
+  catch (error) { console.error("Production workspace error:", error); handleApiError(error); }
+  finally { submitButton.disabled = false; submitButton.textContent = originalText; }
+}
+
+async function handleAddVisual(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("visualProjectSelect")?.value || "").trim();
+  const description = String(document.getElementById("visualDescription")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) { showToast("Connect your Admin Session first."); openAdminModal(); return; }
+  if (!projectId || !description) { showToast("Choose a project and describe the visual."); return; }
+  await submitProductionForm(form, "Saving Visual...", () => CreatorAPI.addVisual({
+    projectId, description,
+    scriptId: String(document.getElementById("visualScriptId")?.value || "").trim(),
+    visualType: String(document.getElementById("visualType")?.value || "").trim(),
+    estimatedDuration: String(document.getElementById("visualDuration")?.value || "").trim(),
+    searchQuery: String(document.getElementById("visualSearchQuery")?.value || "").trim(),
+    onScreenText: String(document.getElementById("visualOnScreenText")?.value || "").trim()
+  }));
+}
+
+async function handleAddEditBlueprint(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("editProjectSelect")?.value || "").trim();
+  const editingNotes = String(document.getElementById("editNotes")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) { showToast("Connect your Admin Session first."); openAdminModal(); return; }
+  if (!projectId || !editingNotes) { showToast("Choose a project and enter editing notes."); return; }
+  await submitProductionForm(form, "Saving Edit Beat...", () => CreatorAPI.addEditBlueprint({
+    projectId, editingNotes,
+    scriptId: String(document.getElementById("editScriptId")?.value || "").trim(),
+    startTime: String(document.getElementById("editStartTime")?.value || "").trim(),
+    endTime: String(document.getElementById("editEndTime")?.value || "").trim(),
+    aRoll: String(document.getElementById("editARoll")?.value || "").trim(),
+    bRoll: String(document.getElementById("editBRoll")?.value || "").trim(),
+    graphics: String(document.getElementById("editGraphics")?.value || "").trim(),
+    soundDesign: String(document.getElementById("editSoundDesign")?.value || "").trim()
+  }));
 }
 
 async function loadScriptSourceOptions(event) {

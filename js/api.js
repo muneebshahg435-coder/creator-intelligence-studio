@@ -339,6 +339,10 @@ async function addScriptSection(scriptData) {
   return request("addScriptSection", scriptData);
 }
 
+async function addVisual(visualData) { return request("addVisual", visualData); }
+
+async function addEditBlueprint(editData) { return request("addEditBlueprint", editData); }
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -427,7 +431,11 @@ async function addScriptSection(scriptData) {
 
     addAngle,
 
-    addScriptSection
+    addScriptSection,
+
+    addVisual,
+
+    addEditBlueprint
 
   });
 
