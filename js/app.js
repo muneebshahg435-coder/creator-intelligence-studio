@@ -1,26 +1,26 @@
 "use strict";
 
-
 /*
 =========================================================
 CREATOR INTELLIGENCE STUDIO
-FRONTEND APPLICATION
+FRONTEND APPLICATION — v0.2
 =========================================================
 */
 
 
-document.addEventListener("DOMContentLoaded", () => {
-
-  initializeApplication();
-
-});
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+    initializeApplication();
+  }
+);
 
 
 /* =====================================================
-   APPLICATION INITIALIZATION
+   INITIALIZATION
 ===================================================== */
 
-function initializeApplication() {
+async function initializeApplication() {
 
   setApplicationVersion();
 
@@ -28,15 +28,28 @@ function initializeApplication() {
 
   setupMobileSidebar();
 
-  setupProjectForm();
-
   setupCharacterCounter();
+
+  setupProjectForm();
 
   setupTopNewProjectButton();
 
-  setupClearProjectsButton();
+  setupAdminAuthentication();
 
-  renderProjects();
+  await checkBackendHealth();
+
+  updateAuthenticationUI();
+
+
+  if (CreatorAPI.hasAdminToken()) {
+
+    await loadProjects();
+
+  } else {
+
+    renderProjects([]);
+
+  }
 
 }
 
@@ -47,15 +60,427 @@ function initializeApplication() {
 
 function setApplicationVersion() {
 
-  const versionElement =
-    document.getElementById("appVersion");
+  const element =
+    document.getElementById(
+      "appVersion"
+    );
 
-  if (!versionElement) {
+  if (element) {
+
+    element.textContent =
+      APP_CONFIG.version;
+
+  }
+
+}
+
+
+/* =====================================================
+   BACKEND HEALTH
+===================================================== */
+
+async function checkBackendHealth() {
+
+  setBackendStatus(
+    "checking",
+    "Checking Backend..."
+  );
+
+
+  try {
+
+    const result =
+      await CreatorAPI.healthCheck();
+
+
+    if (
+      result.success &&
+      result.status === "online"
+    ) {
+
+      setBackendStatus(
+        "online",
+        "Backend Online"
+      );
+
+      return true;
+
+    }
+
+
+    throw new Error(
+      "Backend health check failed."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "Backend health check:",
+      error
+    );
+
+
+    setBackendStatus(
+      "offline",
+      "Backend Offline"
+    );
+
+
+    return false;
+
+  }
+
+}
+
+
+function setBackendStatus(
+  status,
+  text
+) {
+
+  const dot =
+    document.getElementById(
+      "backendStatusDot"
+    );
+
+  const label =
+    document.getElementById(
+      "backendStatusText"
+    );
+
+
+  if (!dot || !label) {
     return;
   }
 
-  versionElement.textContent =
-    APP_CONFIG.version;
+
+  dot.classList.remove(
+    "status-checking",
+    "status-online",
+    "status-offline"
+  );
+
+
+  if (status === "online") {
+
+    dot.classList.add(
+      "status-online"
+    );
+
+  } else if (status === "offline") {
+
+    dot.classList.add(
+      "status-offline"
+    );
+
+  } else {
+
+    dot.classList.add(
+      "status-checking"
+    );
+
+  }
+
+
+  label.textContent =
+    text;
+
+}
+
+
+/* =====================================================
+   ADMIN AUTHENTICATION
+===================================================== */
+
+function setupAdminAuthentication() {
+
+  const accessButton =
+    document.getElementById(
+      "adminAccessButton"
+    );
+
+  const modal =
+    document.getElementById(
+      "adminModal"
+    );
+
+  const closeButton =
+    document.getElementById(
+      "adminModalClose"
+    );
+
+  const form =
+    document.getElementById(
+      "adminAccessForm"
+    );
+
+  const disconnectButton =
+    document.getElementById(
+      "disconnectAdminButton"
+    );
+
+  const backendButton =
+    document.getElementById(
+      "backendStatusButton"
+    );
+
+
+  accessButton?.addEventListener(
+    "click",
+    openAdminModal
+  );
+
+
+  backendButton?.addEventListener(
+    "click",
+    checkBackendHealth
+  );
+
+
+  closeButton?.addEventListener(
+    "click",
+    closeAdminModal
+  );
+
+
+  modal?.addEventListener(
+    "click",
+    event => {
+
+      if (event.target === modal) {
+
+        closeAdminModal();
+
+      }
+
+    }
+  );
+
+
+  form?.addEventListener(
+    "submit",
+    handleAdminConnect
+  );
+
+
+  disconnectButton?.addEventListener(
+    "click",
+    disconnectAdmin
+  );
+
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key === "Escape") {
+
+        closeAdminModal();
+
+      }
+
+    }
+  );
+
+}
+
+
+function openAdminModal() {
+
+  const modal =
+    document.getElementById(
+      "adminModal"
+    );
+
+  const tokenInput =
+    document.getElementById(
+      "adminTokenInput"
+    );
+
+
+  modal?.classList.add(
+    "show"
+  );
+
+
+  modal?.setAttribute(
+    "aria-hidden",
+    "false"
+  );
+
+
+  if (tokenInput) {
+
+    tokenInput.value = "";
+
+
+    setTimeout(
+      () => {
+        tokenInput.focus();
+      },
+      100
+    );
+
+  }
+
+}
+
+
+function closeAdminModal() {
+
+  const modal =
+    document.getElementById(
+      "adminModal"
+    );
+
+
+  modal?.classList.remove(
+    "show"
+  );
+
+
+  modal?.setAttribute(
+    "aria-hidden",
+    "true"
+  );
+
+}
+
+
+async function handleAdminConnect(
+  event
+) {
+
+  event.preventDefault();
+
+
+  const tokenInput =
+    document.getElementById(
+      "adminTokenInput"
+    );
+
+
+  const token =
+    String(
+      tokenInput?.value || ""
+    ).trim();
+
+
+  if (!token) {
+
+    showToast(
+      "Enter your Admin Token."
+    );
+
+    return;
+
+  }
+
+
+  CreatorAPI.saveAdminToken(
+    token
+  );
+
+
+  showToast(
+    "Verifying admin access..."
+  );
+
+
+  try {
+
+    await CreatorAPI.listProjects();
+
+
+    closeAdminModal();
+
+
+    updateAuthenticationUI();
+
+
+    await loadProjects();
+
+
+    showToast(
+      "Admin session connected."
+    );
+
+  } catch (error) {
+
+    CreatorAPI.clearAdminToken();
+
+
+    updateAuthenticationUI();
+
+
+    console.error(error);
+
+
+    if (error.code === "AUTH_FAILED") {
+
+      showToast(
+        "Invalid Admin Token."
+      );
+
+    } else {
+
+      showToast(
+        error.message ||
+        "Could not connect admin session."
+      );
+
+    }
+
+  }
+
+}
+
+
+function disconnectAdmin() {
+
+  CreatorAPI.clearAdminToken();
+
+
+  updateAuthenticationUI();
+
+
+  renderProjects([]);
+
+
+  closeAdminModal();
+
+
+  showToast(
+    "Admin session disconnected."
+  );
+
+}
+
+
+function updateAuthenticationUI() {
+
+  const button =
+    document.getElementById(
+      "adminAccessButton"
+    );
+
+
+  if (!button) {
+    return;
+  }
+
+
+  if (CreatorAPI.hasAdminToken()) {
+
+    button.textContent =
+      "Admin Connected";
+
+  } else {
+
+    button.textContent =
+      "Connect Admin";
+
+  }
 
 }
 
@@ -66,65 +491,99 @@ function setApplicationVersion() {
 
 function setupNavigation() {
 
-  const navigationItems =
-    document.querySelectorAll(".nav-item[data-section]");
+  const items =
+    document.querySelectorAll(
+      ".nav-item[data-section]"
+    );
 
-  navigationItems.forEach((item) => {
 
-    item.addEventListener("click", () => {
+  items.forEach(
+    item => {
 
-      const section =
-        item.dataset.section;
+      item.addEventListener(
+        "click",
+        () => {
 
-      showSection(section);
+          const section =
+            item.dataset.section;
 
-      navigationItems.forEach((navItem) => {
-        navItem.classList.remove("active");
-      });
 
-      item.classList.add("active");
+          showSection(section);
 
-      closeMobileSidebar();
 
-    });
+          items.forEach(
+            navItem => {
 
-  });
+              navItem.classList
+                .remove("active");
+
+            }
+          );
+
+
+          item.classList.add(
+            "active"
+          );
+
+
+          closeMobileSidebar();
+
+        }
+      );
+
+    }
+  );
 
 }
 
 
-function showSection(sectionName) {
+function showSection(
+  sectionName
+) {
 
   const sections =
-    document.querySelectorAll(".page-section");
-
-  sections.forEach((section) => {
-    section.classList.remove("active-section");
-  });
+    document.querySelectorAll(
+      ".page-section"
+    );
 
 
-  const targetSection =
+  sections.forEach(
+    section => {
+
+      section.classList.remove(
+        "active-section"
+      );
+
+    }
+  );
+
+
+  const target =
     document.getElementById(
       `${sectionName}Section`
     );
 
 
-  if (!targetSection) {
+  if (!target) {
 
     showToast(
       "This section is not available yet."
     );
 
     return;
+
   }
 
 
-  targetSection.classList.add(
+  target.classList.add(
     "active-section"
   );
 
 
-  updatePageHeader(sectionName);
+  updatePageHeader(
+    sectionName
+  );
+
 
   window.scrollTo({
     top: 0,
@@ -134,16 +593,22 @@ function showSection(sectionName) {
 }
 
 
-function updatePageHeader(sectionName) {
+function updatePageHeader(
+  sectionName
+) {
 
-  const pageTitle =
-    document.getElementById("pageTitle");
+  const title =
+    document.getElementById(
+      "pageTitle"
+    );
 
-  const pageSubtitle =
-    document.getElementById("pageSubtitle");
+  const subtitle =
+    document.getElementById(
+      "pageSubtitle"
+    );
 
 
-  const pageData = {
+  const pages = {
 
     dashboard: {
       title: "Dashboard",
@@ -196,20 +661,20 @@ function updatePageHeader(sectionName) {
   };
 
 
-  const currentPage =
-    pageData[sectionName];
+  const page =
+    pages[sectionName];
 
 
-  if (!currentPage) {
+  if (!page) {
     return;
   }
 
 
-  pageTitle.textContent =
-    currentPage.title;
+  title.textContent =
+    page.title;
 
-  pageSubtitle.textContent =
-    currentPage.subtitle;
+  subtitle.textContent =
+    page.subtitle;
 
 }
 
@@ -220,49 +685,47 @@ function updatePageHeader(sectionName) {
 
 function setupMobileSidebar() {
 
-  const menuButton =
-    document.getElementById("menuButton");
-
-  const closeButton =
-    document.getElementById("sidebarClose");
-
-  const overlay =
-    document.getElementById("sidebarOverlay");
-
-
-  if (menuButton) {
-
-    menuButton.addEventListener(
+  document
+    .getElementById(
+      "menuButton"
+    )
+    ?.addEventListener(
       "click",
       openMobileSidebar
     );
 
-  }
 
-
-  if (closeButton) {
-
-    closeButton.addEventListener(
+  document
+    .getElementById(
+      "sidebarClose"
+    )
+    ?.addEventListener(
       "click",
       closeMobileSidebar
     );
 
-  }
 
-
-  if (overlay) {
-
-    overlay.addEventListener(
+  document
+    .getElementById(
+      "sidebarOverlay"
+    )
+    ?.addEventListener(
       "click",
       closeMobileSidebar
     );
-
-  }
 
 
   window.addEventListener(
     "resize",
-    handleWindowResize
+    () => {
+
+      if (window.innerWidth > 850) {
+
+        closeMobileSidebar();
+
+      }
+
+    }
   );
 
 }
@@ -270,47 +733,44 @@ function setupMobileSidebar() {
 
 function openMobileSidebar() {
 
-  const sidebar =
-    document.getElementById("sidebar");
-
-  const overlay =
-    document.getElementById(
-      "sidebarOverlay"
+  document
+    .getElementById(
+      "sidebar"
+    )
+    ?.classList.add(
+      "open"
     );
 
 
-  sidebar?.classList.add("open");
-
-  overlay?.classList.add("show");
+  document
+    .getElementById(
+      "sidebarOverlay"
+    )
+    ?.classList.add(
+      "show"
+    );
 
 }
 
 
 function closeMobileSidebar() {
 
-  const sidebar =
-    document.getElementById("sidebar");
-
-  const overlay =
-    document.getElementById(
-      "sidebarOverlay"
+  document
+    .getElementById(
+      "sidebar"
+    )
+    ?.classList.remove(
+      "open"
     );
 
 
-  sidebar?.classList.remove("open");
-
-  overlay?.classList.remove("show");
-
-}
-
-
-function handleWindowResize() {
-
-  if (window.innerWidth > 850) {
-
-    closeMobileSidebar();
-
-  }
+  document
+    .getElementById(
+      "sidebarOverlay"
+    )
+    ?.classList.remove(
+      "show"
+    );
 
 }
 
@@ -326,12 +786,8 @@ function setupCharacterCounter() {
       "projectInput"
     );
 
-  if (!input) {
-    return;
-  }
 
-
-  input.addEventListener(
+  input?.addEventListener(
     "input",
     updateCharacterCounter
   );
@@ -360,85 +816,67 @@ function updateCharacterCounter() {
   }
 
 
-  const length =
-    input.value.length;
-
-  const max =
+  counter.textContent =
+    `${input.value.length} / ` +
     APP_CONFIG.limits
       .projectInputMaxLength;
-
-
-  counter.textContent =
-    `${length} / ${max}`;
 
 }
 
 
 /* =====================================================
-   PROJECT FORM
+   PROJECT CREATION
 ===================================================== */
 
 function setupProjectForm() {
 
-  const projectForm =
-    document.getElementById(
+  document
+    .getElementById(
       "projectForm"
+    )
+    ?.addEventListener(
+      "submit",
+      handleProjectCreation
     );
-
-
-  if (!projectForm) {
-    return;
-  }
-
-
-  projectForm.addEventListener(
-    "submit",
-    handleProjectCreation
-  );
 
 }
 
 
-function handleProjectCreation(event) {
+async function handleProjectCreation(
+  event
+) {
 
   event.preventDefault();
 
 
+  if (!CreatorAPI.hasAdminToken()) {
+
+    showToast(
+      "Connect your Admin Session first."
+    );
+
+
+    openAdminModal();
+
+
+    return;
+
+  }
+
+
   const input =
     document
-      .getElementById("projectInput")
+      .getElementById(
+        "projectInput"
+      )
       .value
       .trim();
-
-
-  const language =
-    document
-      .getElementById("projectLanguage")
-      .value;
-
-
-  const videoType =
-    document
-      .getElementById("videoType")
-      .value;
-
-
-  const videoLength =
-    document
-      .getElementById("videoLength")
-      .value;
-
-
-  const researchDepth =
-    document
-      .getElementById("researchDepth")
-      .value;
 
 
   if (!input) {
 
     showToast(
-      "Please enter a topic, article, URL or notes."
+      "Enter a topic, article, URL or notes."
     );
 
     return;
@@ -453,7 +891,7 @@ function handleProjectCreation(event) {
   ) {
 
     showToast(
-      "Your project input is too long."
+      "Project input is too long."
     );
 
     return;
@@ -461,202 +899,196 @@ function handleProjectCreation(event) {
   }
 
 
-  const project = {
-
-    id: generateProjectId(),
-
-    title: createProjectTitle(input),
-
-    originalInput: input,
-
-    language,
-
-    videoType,
-
-    videoLength,
-
-    researchDepth,
-
-    status: "Idea",
-
-    createdAt:
-      new Date().toISOString()
-
-  };
-
-
-  const projects =
-    getStoredProjects();
-
-
-  projects.unshift(project);
-
-
-  saveProjects(projects);
-
-
-  renderProjects();
-
-
-  resetProjectForm();
-
-
-  showToast(
-    "Project created successfully."
-  );
-
-
-  scrollToProjects();
-
-}
-
-
-/* =====================================================
-   PROJECT HELPERS
-===================================================== */
-
-function generateProjectId() {
-
-  return (
-    "project_" +
-    Date.now().toString(36) +
-    "_" +
-    Math.random()
-      .toString(36)
-      .slice(2, 8)
-  );
-
-}
-
-
-function createProjectTitle(input) {
-
-  const cleanInput =
-    input
-      .replace(/\s+/g, " ")
-      .trim();
-
-
-  const maxTitleLength = 75;
-
-
-  if (
-    cleanInput.length <=
-    maxTitleLength
-  ) {
-
-    return cleanInput;
-
-  }
-
-
-  return (
-    cleanInput
-      .slice(0, maxTitleLength)
-      .trim() +
-    "..."
-  );
-
-}
-
-
-function resetProjectForm() {
-
-  const projectForm =
-    document.getElementById(
-      "projectForm"
-    );
-
-
-  if (!projectForm) {
-    return;
-  }
-
-
-  projectForm.reset();
-
-
-  document
-    .getElementById("videoLength")
-    .value = "10";
-
-
-  document
-    .getElementById("researchDepth")
-    .value = "standard";
-
-
-  updateCharacterCounter();
-
-}
-
-
-/* =====================================================
-   LOCAL STORAGE
-===================================================== */
-
-function getStoredProjects() {
-
-  try {
-
-    const storedData =
-      localStorage.getItem(
-        APP_CONFIG.storageKeys.projects
+  const submitButton =
+    event.currentTarget
+      .querySelector(
+        'button[type="submit"]'
       );
 
 
-    if (!storedData) {
-      return [];
+  const originalButtonText =
+    submitButton.textContent;
+
+
+  submitButton.disabled =
+    true;
+
+
+  submitButton.textContent =
+    "Creating Project...";
+
+
+  try {
+
+    const response =
+      await CreatorAPI.createProject({
+
+        originalInput:
+          input,
+
+        inputType:
+          detectInputType(
+            input
+          ),
+
+        language:
+          document
+            .getElementById(
+              "projectLanguage"
+            )
+            .value,
+
+        videoType:
+          document
+            .getElementById(
+              "videoType"
+            )
+            .value,
+
+        targetLength:
+          document
+            .getElementById(
+              "videoLength"
+            )
+            .value,
+
+        researchDepth:
+          document
+            .getElementById(
+              "researchDepth"
+            )
+            .value
+
+      });
+
+
+    if (!response.success) {
+
+      throw new Error(
+        response.message ||
+        "Project creation failed."
+      );
+
     }
 
 
-    const parsedData =
-      JSON.parse(storedData);
+    resetProjectForm();
 
 
-    if (!Array.isArray(parsedData)) {
-      return [];
-    }
+    await loadProjects();
 
 
-    return parsedData;
+    showToast(
+      "Project saved to Google Sheets."
+    );
 
-  }
-  catch (error) {
+
+    scrollToProjects();
+
+  } catch (error) {
 
     console.error(
-      "Could not load projects:",
+      "Create project error:",
       error
     );
 
-    return [];
+
+    handleApiError(error);
+
+  } finally {
+
+    submitButton.disabled =
+      false;
+
+
+    submitButton.textContent =
+      originalButtonText;
 
   }
 
 }
 
 
-function saveProjects(projects) {
+/* =====================================================
+   INPUT TYPE DETECTION
+===================================================== */
+
+function detectInputType(
+  input
+) {
+
+  const value =
+    input.trim();
+
+
+  if (
+    /^https?:\/\/\S+$/i.test(
+      value
+    )
+  ) {
+
+    return "url";
+
+  }
+
+
+  if (
+    /^https?:\/\/\S+/i.test(
+      value
+    )
+  ) {
+
+    return "mixed";
+
+  }
+
+
+  if (value.length > 900) {
+
+    return "article";
+
+  }
+
+
+  return "topic";
+
+}
+
+
+/* =====================================================
+   LOAD PROJECTS
+===================================================== */
+
+async function loadProjects() {
+
+  if (!CreatorAPI.hasAdminToken()) {
+
+    renderProjects([]);
+
+    return;
+
+  }
+
 
   try {
 
-    localStorage.setItem(
-      APP_CONFIG.storageKeys.projects,
-      JSON.stringify(projects)
+    const response =
+      await CreatorAPI.listProjects();
+
+
+    renderProjects(
+      response.projects || []
     );
 
-  }
-  catch (error) {
+  } catch (error) {
 
     console.error(
-      "Could not save projects:",
+      "Load projects error:",
       error
     );
 
 
-    showToast(
-      "Project could not be saved in this browser."
-    );
+    handleApiError(error);
 
   }
 
@@ -667,37 +1099,38 @@ function saveProjects(projects) {
    PROJECT RENDERING
 ===================================================== */
 
-function renderProjects() {
+function renderProjects(
+  projects
+) {
 
-  const projectsGrid =
+  const grid =
     document.getElementById(
       "projectsGrid"
     );
 
-  const emptyState =
+  const empty =
     document.getElementById(
       "emptyState"
     );
 
 
-  if (!projectsGrid || !emptyState) {
+  if (!grid || !empty) {
     return;
   }
 
 
-  const projects =
-    getStoredProjects();
+  grid.innerHTML = "";
 
 
-  projectsGrid.innerHTML = "";
+  if (
+    !Array.isArray(projects) ||
+    projects.length === 0
+  ) {
 
-
-  if (projects.length === 0) {
-
-    projectsGrid.style.display =
+    grid.style.display =
       "none";
 
-    emptyState.style.display =
+    empty.style.display =
       "block";
 
     return;
@@ -705,28 +1138,31 @@ function renderProjects() {
   }
 
 
-  projectsGrid.style.display =
+  grid.style.display =
     "grid";
 
-  emptyState.style.display =
+  empty.style.display =
     "none";
 
 
-  projects.forEach((project) => {
+  projects.forEach(
+    project => {
 
-    const projectCard =
-      createProjectCard(project);
+      grid.appendChild(
+        createProjectCard(
+          project
+        )
+      );
 
-    projectsGrid.appendChild(
-      projectCard
-    );
-
-  });
+    }
+  );
 
 }
 
 
-function createProjectCard(project) {
+function createProjectCard(
+  project
+) {
 
   const card =
     document.createElement(
@@ -738,112 +1174,88 @@ function createProjectCard(project) {
     "project-card";
 
 
-  const safeTitle =
-    escapeHTML(
-      project.title ||
-      "Untitled Project"
-    );
-
-
-  const safeType =
-    escapeHTML(
-      formatLabel(
-        project.videoType
-      )
-    );
-
-
-  const safeLanguage =
-    escapeHTML(
-      formatLabel(
-        project.language
-      )
-    );
-
-
-  const safeStatus =
-    escapeHTML(
-      project.status ||
-      "Idea"
-    );
-
-
-  const createdDate =
-    formatProjectDate(
-      project.createdAt
-    );
-
-
   card.innerHTML = `
 
     <div class="project-meta">
 
       <span>
-        ${safeType}
+        ${escapeHTML(
+          formatLabel(
+            project.videoType
+          )
+        )}
       </span>
 
       <span>
-        ${createdDate}
+        ${escapeHTML(
+          formatProjectDate(
+            project.createdAt
+          )
+        )}
       </span>
 
     </div>
 
 
     <h4>
-      ${safeTitle}
+      ${escapeHTML(
+        project.title ||
+        "Untitled Project"
+      )}
     </h4>
 
 
     <p>
-      ${safeLanguage}
-      ·
-      ${formatLength(
-        project.videoLength
+
+      ${escapeHTML(
+        formatLabel(
+          project.language
+        )
       )}
+
       ·
-      ${formatLabel(
-        project.researchDepth
+
+      ${escapeHTML(
+        formatLength(
+          project.targetLength
+        )
       )}
+
+      ·
+
+      ${escapeHTML(
+        formatLabel(
+          project.researchDepth
+        )
+      )}
+
     </p>
 
 
     <div class="project-footer">
 
       <span class="project-status">
-        ${safeStatus}
+
+        ${escapeHTML(
+          project.status ||
+          "Idea"
+        )}
+
       </span>
 
-      <button
-        class="project-delete"
-        data-project-id="${escapeHTML(
-          project.id
-        )}"
-        type="button"
-      >
-        Delete
-      </button>
+
+      <span class="project-id">
+
+        ${escapeHTML(
+          project.projectId ||
+          ""
+        )}
+
+      </span>
 
     </div>
 
   `;
-
-
-  const deleteButton =
-    card.querySelector(
-      ".project-delete"
-    );
-
-
-  deleteButton.addEventListener(
-    "click",
-    () => {
-
-      deleteProject(
-        project.id
-      );
-
-    }
-  );
 
 
   return card;
@@ -852,152 +1264,102 @@ function createProjectCard(project) {
 
 
 /* =====================================================
-   DELETE PROJECT
+   RESET FORM
 ===================================================== */
 
-function deleteProject(projectId) {
+function resetProjectForm() {
 
-  const projects =
-    getStoredProjects();
-
-
-  const updatedProjects =
-    projects.filter(
-      (project) =>
-        project.id !== projectId
-    );
-
-
-  saveProjects(updatedProjects);
-
-  renderProjects();
-
-
-  showToast(
-    "Project deleted."
-  );
-
-}
-
-
-/* =====================================================
-   CLEAR PROJECTS
-===================================================== */
-
-function setupClearProjectsButton() {
-
-  const button =
+  const form =
     document.getElementById(
-      "clearProjectsButton"
+      "projectForm"
     );
 
 
-  if (!button) {
-    return;
+  form?.reset();
+
+
+  const length =
+    document.getElementById(
+      "videoLength"
+    );
+
+
+  const depth =
+    document.getElementById(
+      "researchDepth"
+    );
+
+
+  if (length) {
+
+    length.value =
+      "10";
+
   }
 
 
-  button.addEventListener(
-    "click",
-    () => {
+  if (depth) {
 
-      const projects =
-        getStoredProjects();
+    depth.value =
+      "standard";
 
-
-      if (projects.length === 0) {
-
-        showToast(
-          "There are no projects to clear."
-        );
-
-        return;
-
-      }
+  }
 
 
-      const confirmed =
-        window.confirm(
-          "Delete all locally saved projects?"
-        );
-
-
-      if (!confirmed) {
-        return;
-      }
-
-
-      localStorage.removeItem(
-        APP_CONFIG.storageKeys.projects
-      );
-
-
-      renderProjects();
-
-
-      showToast(
-        "All local projects were removed."
-      );
-
-    }
-  );
+  updateCharacterCounter();
 
 }
 
 
 /* =====================================================
-   NEW PROJECT BUTTON
+   NEW VIDEO BUTTON
 ===================================================== */
 
 function setupTopNewProjectButton() {
 
-  const button =
-    document.getElementById(
+  document
+    .getElementById(
       "topNewProjectButton"
-    );
+    )
+    ?.addEventListener(
+      "click",
+      () => {
 
-
-  if (!button) {
-    return;
-  }
-
-
-  button.addEventListener(
-    "click",
-    () => {
-
-      showSection("dashboard");
-
-
-      setActiveNavigation(
-        "dashboard"
-      );
-
-
-      const createPanel =
-        document.getElementById(
-          "createProjectPanel"
+        showSection(
+          "dashboard"
         );
 
 
-      createPanel?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
+        setActiveNavigation(
+          "dashboard"
+        );
 
-
-      setTimeout(() => {
 
         document
           .getElementById(
-            "projectInput"
+            "createProjectPanel"
           )
-          ?.focus();
+          ?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
 
-      }, 400);
 
-    }
-  );
+        setTimeout(
+          () => {
+
+            document
+              .getElementById(
+                "projectInput"
+              )
+              ?.focus();
+
+          },
+          350
+        );
+
+      }
+    );
 
 }
 
@@ -1006,43 +1368,82 @@ function setActiveNavigation(
   sectionName
 ) {
 
-  const navigationItems =
-    document.querySelectorAll(
+  document
+    .querySelectorAll(
       ".nav-item[data-section]"
+    )
+    .forEach(
+      item => {
+
+        item.classList.toggle(
+          "active",
+          item.dataset.section ===
+            sectionName
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   API ERROR HANDLING
+===================================================== */
+
+function handleApiError(
+  error
+) {
+
+  if (
+    error.code === "AUTH_FAILED" ||
+    error.code === "AUTH_REQUIRED"
+  ) {
+
+    CreatorAPI.clearAdminToken();
+
+
+    updateAuthenticationUI();
+
+
+    renderProjects([]);
+
+
+    showToast(
+      "Admin session expired or is invalid."
     );
 
 
-  navigationItems.forEach(
-    (item) => {
+    openAdminModal();
 
-      item.classList.toggle(
-        "active",
-        item.dataset.section ===
-          sectionName
-      );
 
-    }
+    return;
+
+  }
+
+
+  showToast(
+    error.message ||
+    "Something went wrong."
   );
 
 }
 
 
 /* =====================================================
-   SCROLLING
+   SCROLL
 ===================================================== */
 
 function scrollToProjects() {
 
-  const projectsGrid =
-    document.getElementById(
+  document
+    .getElementById(
       "projectsGrid"
-    );
-
-
-  projectsGrid?.scrollIntoView({
-    behavior: "smooth",
-    block: "center"
-  });
+    )
+    ?.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
 
 }
 
@@ -1051,35 +1452,47 @@ function scrollToProjects() {
    FORMATTERS
 ===================================================== */
 
-function formatLabel(value) {
+function formatLabel(
+  value
+) {
 
   if (!value) {
     return "";
   }
 
 
-  return value
+  return String(value)
 
-    .replace(/-/g, " ")
+    .replace(
+      /-/g,
+      " "
+    )
 
     .replace(
       /\b\w/g,
-      (character) =>
-        character.toUpperCase()
+      character =>
+        character
+          .toUpperCase()
     );
 
 }
 
 
-function formatLength(value) {
+function formatLength(
+  value
+) {
 
   if (value === "short") {
+
     return "YouTube Short";
+
   }
 
 
   if (value === "20") {
+
     return "20+ min";
+
   }
 
 
@@ -1089,11 +1502,11 @@ function formatLength(value) {
 
 
 function formatProjectDate(
-  dateString
+  value
 ) {
 
   const date =
-    new Date(dateString);
+    new Date(value);
 
 
   if (
@@ -1123,14 +1536,20 @@ function formatProjectDate(
    SECURITY
 ===================================================== */
 
-function escapeHTML(value) {
+function escapeHTML(
+  value
+) {
 
   const element =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
 
   element.textContent =
-    String(value ?? "");
+    String(
+      value ?? ""
+    );
 
 
   return element.innerHTML;
@@ -1145,7 +1564,9 @@ function escapeHTML(value) {
 let toastTimer;
 
 
-function showToast(message) {
+function showToast(
+  message
+) {
 
   const toast =
     document.getElementById(
@@ -1167,19 +1588,26 @@ function showToast(message) {
     message;
 
 
-  toast.classList.add("show");
+  toast.classList.add(
+    "show"
+  );
 
 
-  clearTimeout(toastTimer);
+  clearTimeout(
+    toastTimer
+  );
 
 
   toastTimer =
-    setTimeout(() => {
+    setTimeout(
+      () => {
 
-      toast.classList.remove(
-        "show"
-      );
+        toast.classList.remove(
+          "show"
+        );
 
-    }, 3000);
+      },
+      3000
+    );
 
 }
