@@ -36,6 +36,8 @@ async function initializeApplication() {
 
   setupAdminAuthentication();
 
+  setupResearchWorkspace();
+
   await checkBackendHealth();
 
   updateAuthenticationUI();
