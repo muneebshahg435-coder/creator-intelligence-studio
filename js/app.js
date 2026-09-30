@@ -837,6 +837,7 @@ function updateCharacterCounter() {
 
 let researchProjectsCache = [];
 let currentResearchSources = [];
+let currentResearchFindings = [];
 
 
 function setupResearchWorkspace() {
@@ -879,6 +880,10 @@ function setupResearchWorkspace() {
   document
     .getElementById("angleForm")
     ?.addEventListener("submit", handleAddAngle);
+
+  document
+    .getElementById("generateResearchBriefButton")
+    ?.addEventListener("click", generateResearchBrief);
 
 }
 
@@ -1145,6 +1150,8 @@ async function loadProjectResearch(
     const research =
       response.research || [];
 
+    currentResearchFindings = research;
+
 
     const verifiedCount =
       research.filter(
@@ -1278,6 +1285,34 @@ function normalizeSourceUrl(value) {
     url.pathname = url.pathname.replace(/\/$/, "");
   }
   return url.href;
+}
+
+function generateResearchBrief() {
+  const projectId = String(document.getElementById("researchProjectSelect")?.value || "").trim();
+  const output = document.getElementById("researchBriefOutput");
+  if (!projectId || !output) {
+    showToast("Select a research project first.");
+    return;
+  }
+
+  const project = researchProjectsCache.find(item => item.projectId === projectId) || {};
+  const grouped = currentResearchFindings.reduce((sections, item) => {
+    const section = item.section || "General";
+    (sections[section] ||= []).push(item);
+    return sections;
+  }, {});
+  const sectionMarkup = Object.entries(grouped).map(([section, findings]) => `
+    <section class="brief-section"><h4>${escapeHTML(section)}</h4>${findings.map(item => `
+      <article><p>${escapeHTML(item.finding || "")}</p><small>${escapeHTML(formatLabel(item.verificationStatus || "unverified"))} · ${escapeHTML(formatLabel(item.importance || "medium"))} · ${(item.sourceIds || []).length} linked source(s)</small></article>`).join("")}</section>`).join("");
+  const sourceMarkup = currentResearchSources.map(source => {
+    const url = safeHttpUrl(source.url);
+    const label = escapeHTML(source.title || source.url || source.sourceId || "Source");
+    return `<li>${url ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${label}</a>` : label}</li>`;
+  }).join("");
+
+  output.innerHTML = `<div class="brief-heading"><h3>${escapeHTML(project.title || "Research Brief")}</h3><p>${currentResearchFindings.length} findings · ${currentResearchSources.length} sources · ${currentResearchFindings.filter(item => item.verificationStatus === "verified").length} verified</p></div>${sectionMarkup || '<p class="muted-copy">No findings have been saved.</p>'}<section class="brief-section"><h4>Source Register</h4><ol>${sourceMarkup || "<li>No sources saved.</li>"}</ol></section>`;
+  output.hidden = false;
+  output.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
 
@@ -1552,7 +1587,7 @@ async function handleAddResearchFinding(event) {
     await CreatorAPI.addResearchFinding({
       projectId,
       finding,
-      section: String(document.getElementById("researchSection")?.value || "").trim(),
+      section: String(document.getElementById("researchFindingSection")?.value || "").trim(),
       importance: document.getElementById("researchImportance")?.value || "medium",
       verificationStatus: document.getElementById("researchVerificationStatus")?.value || "unverified",
       sourceIds: Array.from(

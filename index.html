@@ -1052,8 +1052,8 @@
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label for="researchSection">Section</label>
-            <input class="text-input" id="researchSection" type="text" maxlength="120" placeholder="Background, economy, technology...">
+            <label for="researchFindingSection">Section</label>
+            <input class="text-input" id="researchFindingSection" type="text" maxlength="120" placeholder="Background, economy, technology...">
           </div>
           <div class="form-group">
             <label for="researchImportance">Importance</label>
@@ -1143,6 +1143,14 @@
         <div class="panel-header"><div><span class="section-kicker">CLAIMS</span><h3>Findings</h3></div></div>
         <div id="findingsList" class="research-list"><p class="muted-copy">Select a project to load its findings.</p></div>
       </section>
+    </section>
+
+    <section class="panel research-entry-panel">
+      <div class="panel-header">
+        <div><span class="section-kicker">RESEARCH BRIEF</span><h3>Evidence Summary</h3><p>Generate a structured brief from the selected project’s saved sources and findings.</p></div>
+        <button class="secondary-button" id="generateResearchBriefButton" type="button">Generate Brief</button>
+      </div>
+      <div id="researchBriefOutput" class="research-brief-output" hidden></div>
     </section>
   </section>
 

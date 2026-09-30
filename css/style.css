@@ -1952,6 +1952,22 @@ button:disabled {
   line-height: 1.4;
 }
 
+.research-brief-output {
+  padding: 18px;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  background: #0b1018;
+}
+
+.research-brief-output[hidden] { display: none; }
+.brief-heading { padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.brief-heading h3, .brief-heading p, .brief-section h4, .brief-section p { margin: 0; }
+.brief-heading p, .brief-section small { color: var(--text-secondary); }
+.brief-section { margin-top: 18px; }
+.brief-section article { padding: 12px 0; border-bottom: 1px solid var(--border); }
+.brief-section article:last-child { border-bottom: 0; }
+.brief-section ol { padding-left: 22px; color: var(--text-secondary); }
+
 .status-pill {
   flex: 0 0 auto;
   border: 1px solid var(--border-light);
