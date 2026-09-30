@@ -189,22 +189,40 @@
         </div>
 
 
-        <div class="topbar-right">
+ <div class="topbar-right">
 
-          <div class="system-status">
-            <span class="status-dot"></span>
-            Frontend Ready
-          </div>
+  <button
+    class="system-status status-button"
+    id="backendStatusButton"
+    type="button"
+  >
+    <span
+      class="status-dot status-checking"
+      id="backendStatusDot"
+    ></span>
 
-          <button
-            class="primary-button desktop-new-project"
-            id="topNewProjectButton"
-          >
-            + New Video
-          </button>
+    <span id="backendStatusText">
+      Checking Backend...
+    </span>
+  </button>
 
-        </div>
+  <button
+    class="secondary-button"
+    id="adminAccessButton"
+    type="button"
+  >
+    Connect Admin
+  </button>
 
+  <button
+    class="primary-button desktop-new-project"
+    id="topNewProjectButton"
+    type="button"
+  >
+    + New Video
+  </button>
+
+</div>
       </header>
 
 
