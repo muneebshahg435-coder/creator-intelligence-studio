@@ -850,8 +850,6 @@ function setupResearchWorkspace() {
     handleResearchProjectSelection
   );
 
-}
-
   const sourceForm =
     document.getElementById(
       "sourceForm"
@@ -862,6 +860,12 @@ function setupResearchWorkspace() {
     "submit",
     handleAddSource
   );
+
+  document
+    .getElementById("researchFindingForm")
+    ?.addEventListener("submit", handleAddResearchFinding);
+
+}
 
 function populateResearchProjectSelect(
   projects
@@ -1039,6 +1043,8 @@ async function loadProjectResearch(
       verifiedCount
     );
 
+    renderResearchLists(sources, research);
+
   }
   catch (error) {
 
@@ -1052,6 +1058,55 @@ async function loadProjectResearch(
 
   }
 
+}
+
+function renderResearchLists(sources, findings) {
+  renderSourceList(sources);
+  renderFindingList(findings);
+}
+
+function renderSourceList(sources) {
+  const list = document.getElementById("sourcesList");
+  if (!list) return;
+  if (!sources.length) {
+    list.innerHTML = '<p class="muted-copy">No sources have been saved for this project.</p>';
+    return;
+  }
+  list.innerHTML = sources.map(source => {
+    const title = source.title || source.url || "Untitled source";
+    const meta = [source.publisher, formatLabel(source.sourceType), formatLabel(source.sourceTier)]
+      .filter(Boolean).map(escapeHTML).join(" · ");
+    const url = safeHttpUrl(source.url);
+    const linkedTitle = url
+      ? `<a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(title)}</a>`
+      : escapeHTML(title);
+    return `<article class="research-item"><div><h4>${linkedTitle}</h4><p>${meta || "Source details not classified"}</p></div><span class="status-pill">${escapeHTML(formatLabel(source.reliabilityLabel) || "Unreviewed")}</span></article>`;
+  }).join("");
+}
+
+function renderFindingList(findings) {
+  const list = document.getElementById("findingsList");
+  if (!list) return;
+  if (!findings.length) {
+    list.innerHTML = '<p class="muted-copy">No findings have been saved for this project.</p>';
+    return;
+  }
+  list.innerHTML = findings.map(finding => {
+    const claim = finding.finding || finding.claim || finding.text || "Untitled finding";
+    const meta = [finding.section, formatLabel(finding.importance)]
+      .filter(Boolean).map(escapeHTML).join(" · ");
+    const state = formatLabel(finding.verificationStatus || "unverified");
+    return `<article class="research-item finding-item"><div><p class="finding-copy">${escapeHTML(claim)}</p><p>${meta || "No section or priority set"}</p></div><span class="status-pill status-${escapeHTML(String(finding.verificationStatus || "unverified"))}">${escapeHTML(state)}</span></article>`;
+  }).join("");
+}
+
+function safeHttpUrl(value) {
+  try {
+    const url = new URL(String(value || ""));
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch (_) {
+    return "";
+  }
 }
 
 
@@ -1174,7 +1229,7 @@ async function handleAddSource(event) {
 
 
   const submitButton =
-    event.currentTarget
+    form
       .querySelector(
         'button[type="submit"]'
       );
@@ -1288,6 +1343,48 @@ async function handleAddSource(event) {
 
   }
 
+}
+
+async function handleAddResearchFinding(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("researchProjectSelect")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) {
+    showToast("Connect your Admin Session first.");
+    openAdminModal();
+    return;
+  }
+  if (!projectId) {
+    showToast("Select a project first.");
+    return;
+  }
+  const finding = String(document.getElementById("researchFinding")?.value || "").trim();
+  if (!finding) {
+    showToast("Enter a research finding.");
+    return;
+  }
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Adding Finding...";
+  try {
+    await CreatorAPI.addResearchFinding({
+      projectId,
+      finding,
+      section: String(document.getElementById("researchSection")?.value || "").trim(),
+      importance: document.getElementById("researchImportance")?.value || "medium",
+      verificationStatus: document.getElementById("researchVerificationStatus")?.value || "unverified"
+    });
+    form.reset();
+    await loadProjectResearch(projectId);
+    showToast("Finding added successfully.");
+  } catch (error) {
+    console.error("Add research finding error:", error);
+    handleApiError(error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
 }
 /* =====================================================
    PROJECT CREATION

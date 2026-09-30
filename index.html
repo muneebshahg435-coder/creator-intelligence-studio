@@ -1037,6 +1037,50 @@
   </form>
 
 </section>
+    <section class="panel research-entry-panel">
+      <div class="panel-header">
+        <div>
+          <span class="section-kicker">RESEARCH FINDING</span>
+          <h3>Add Research Finding</h3>
+          <p>Record one checkable claim and its current verification state.</p>
+        </div>
+      </div>
+      <form id="researchFindingForm">
+        <div class="form-group">
+          <label for="researchFinding">Finding or claim</label>
+          <textarea class="text-input" id="researchFinding" rows="5" maxlength="5000" placeholder="State one factual finding. Add the supporting source URL above first." required></textarea>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="researchSection">Section</label>
+            <input class="text-input" id="researchSection" type="text" maxlength="120" placeholder="Background, economy, technology...">
+          </div>
+          <div class="form-group">
+            <label for="researchImportance">Importance</label>
+            <select id="researchImportance"><option value="medium">Medium</option><option value="low">Low</option><option value="high">High</option><option value="critical">Critical</option></select>
+          </div>
+          <div class="form-group">
+            <label for="researchVerificationStatus">Verification state</label>
+            <select id="researchVerificationStatus"><option value="unverified">Unverified</option><option value="partially-verified">Partially verified</option><option value="verified">Verified</option><option value="disputed">Disputed</option><option value="outdated">Outdated</option></select>
+          </div>
+        </div>
+        <div class="create-actions">
+          <div class="create-note"><span>✓</span>Claims remain clearly labelled until verified.</div>
+          <button class="primary-button" type="submit">Add Finding</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="research-results-grid" aria-live="polite">
+      <section class="panel research-list-panel">
+        <div class="panel-header"><div><span class="section-kicker">EVIDENCE</span><h3>Sources</h3></div></div>
+        <div id="sourcesList" class="research-list"><p class="muted-copy">Select a project to load its sources.</p></div>
+      </section>
+      <section class="panel research-list-panel">
+        <div class="panel-header"><div><span class="section-kicker">CLAIMS</span><h3>Findings</h3></div></div>
+        <div id="findingsList" class="research-list"><p class="muted-copy">Select a project to load its findings.</p></div>
+      </section>
+    </section>
   </section>
 
 </section>
