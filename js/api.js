@@ -286,6 +286,43 @@ const CreatorAPI = (() => {
 
   }
 
+ async function addSource(
+  sourceData
+) {
+
+  return request(
+    "addSource",
+    sourceData
+  );
+
+}
+
+
+async function addResearchFinding(
+  researchData
+) {
+
+  return request(
+    "addResearchFinding",
+    researchData
+  );
+
+}
+
+
+async function getProjectResearch(
+  projectId
+) {
+
+  return request(
+    "getProjectResearch",
+    {
+      projectId
+    }
+  );
+
+} 
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -362,6 +399,12 @@ const CreatorAPI = (() => {
     listProjects,
 
     getProject
+
+    addSource,
+
+addResearchFinding,
+
+getProjectResearch,
 
   });
 
