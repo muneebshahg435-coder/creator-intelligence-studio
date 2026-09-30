@@ -1114,6 +1114,8 @@ async function handleAddSource(event) {
 
   event.preventDefault();
 
+  const form =
+    event.currentTarget;
 
   if (!CreatorAPI.hasAdminToken()) {
 
@@ -1252,7 +1254,7 @@ async function handleAddSource(event) {
     });
 
 
-    event.currentTarget.reset();
+    form.reset();
 
 
     await loadProjectResearch(
@@ -1362,12 +1364,10 @@ async function handleProjectCreation(
   }
 
 
-  const submitButton =
-    event.currentTarget
-      .querySelector(
-        'button[type="submit"]'
-      );
-
+const submitButton =
+  form.querySelector(
+    'button[type="submit"]'
+  );
 
   const originalButtonText =
     submitButton.textContent;
