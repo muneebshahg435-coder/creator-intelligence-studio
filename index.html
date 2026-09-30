@@ -813,7 +813,108 @@
 
   </div>
 
+<!-- =========================
+     ADMIN AUTHENTICATION
+========================== -->
 
+<div
+  class="modal-backdrop"
+  id="adminModal"
+  aria-hidden="true"
+>
+
+  <div
+    class="modal-card"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="adminModalTitle"
+  >
+
+    <div class="modal-header">
+
+      <div>
+
+        <span class="section-kicker">
+          SECURE BACKEND ACCESS
+        </span>
+
+        <h3 id="adminModalTitle">
+          Connect Admin Session
+        </h3>
+
+      </div>
+
+      <button
+        class="modal-close"
+        id="adminModalClose"
+        type="button"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <p class="modal-description">
+      Enter your private Creator Intelligence Studio Admin Token.
+      The token will remain only in this browser session
+      and will not be written to GitHub.
+    </p>
+
+    <form id="adminAccessForm">
+
+      <div class="form-group">
+
+        <label for="adminTokenInput">
+          Admin Token
+        </label>
+
+        <input
+          class="text-input"
+          id="adminTokenInput"
+          type="password"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Paste your private Admin Token"
+          required
+        >
+
+      </div>
+
+      <div class="token-security-note">
+
+        <strong>Private credential</strong>
+
+        <span>
+          Never paste this token into GitHub files.
+        </span>
+
+      </div>
+
+      <div class="modal-actions">
+
+        <button
+          class="secondary-button"
+          id="disconnectAdminButton"
+          type="button"
+        >
+          Disconnect
+        </button>
+
+        <button
+          class="primary-button"
+          type="submit"
+        >
+          Connect
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
   <!-- =========================
        TOAST
   ========================== -->
