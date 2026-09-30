@@ -1077,6 +1077,21 @@
     </section>
 
     <section class="panel research-entry-panel">
+      <div class="panel-header"><div><span class="section-kicker">STORY ANGLE</span><h3>Develop a Story Angle</h3><p>Turn verified research into a clear audience promise before writing a script.</p></div></div>
+      <form id="angleForm">
+        <div class="form-group"><label for="angleTitle">Angle title</label><input class="text-input" id="angleTitle" maxlength="240" placeholder="Why this story matters now" required></div>
+        <div class="form-group"><label for="angleQuestion">Central question</label><input class="text-input" id="angleQuestion" maxlength="500" placeholder="What will the viewer understand by the end?"></div>
+        <div class="form-grid">
+          <div class="form-group"><label for="anglePromise">Audience promise</label><textarea class="text-input" id="anglePromise" rows="3" maxlength="1000" placeholder="A precise, honest takeaway for the viewer."></textarea></div>
+          <div class="form-group"><label for="angleRationale">Evidence rationale</label><textarea class="text-input" id="angleRationale" rows="3" maxlength="3000" placeholder="Why the available evidence supports this angle."></textarea></div>
+          <div class="form-group"><label for="angleStoryPotential">Story potential</label><select id="angleStoryPotential"><option value="medium">Medium</option><option value="high">High</option><option value="low">Low</option></select></div>
+          <div class="form-group"><label for="angleEvidenceStrength">Evidence strength</label><select id="angleEvidenceStrength"><option value="moderate">Moderate</option><option value="strong">Strong</option><option value="weak">Weak</option></select></div>
+        </div>
+        <div class="create-actions"><div class="create-note"><span>✓</span>Use claims and sources to judge the strength honestly.</div><button class="primary-button" type="submit">Save Story Angle</button></div>
+      </form>
+    </section>
+
+    <section class="panel research-entry-panel">
       <div class="panel-header">
         <div>
           <span class="section-kicker">CLAIM REVIEW</span>

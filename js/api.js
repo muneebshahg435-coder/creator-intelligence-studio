@@ -331,6 +331,10 @@ async function addClaim(claimData) {
   return request("addClaim", claimData);
 }
 
+async function addAngle(angleData) {
+  return request("addAngle", angleData);
+}
+
 
   /* =====================================================
      RESPONSE PARSER
@@ -415,7 +419,9 @@ async function addClaim(claimData) {
 
     getProjectProduction,
 
-    addClaim
+    addClaim,
+
+    addAngle
 
   });
 

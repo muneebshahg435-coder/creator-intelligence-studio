@@ -869,6 +869,10 @@ function setupResearchWorkspace() {
     .getElementById("claimForm")
     ?.addEventListener("submit", handleAddClaim);
 
+  document
+    .getElementById("angleForm")
+    ?.addEventListener("submit", handleAddAngle);
+
 }
 
 function populateResearchProjectSelect(
@@ -1469,6 +1473,45 @@ async function handleAddClaim(event) {
     showToast("Claim saved successfully.");
   } catch (error) {
     console.error("Add claim error:", error);
+    handleApiError(error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalText;
+  }
+}
+
+async function handleAddAngle(event) {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const projectId = String(document.getElementById("researchProjectSelect")?.value || "").trim();
+  const angleTitle = String(document.getElementById("angleTitle")?.value || "").trim();
+  if (!CreatorAPI.hasAdminToken()) {
+    showToast("Connect your Admin Session first.");
+    openAdminModal();
+    return;
+  }
+  if (!projectId || !angleTitle) {
+    showToast("Select a project and enter an angle title first.");
+    return;
+  }
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalText = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Saving Angle...";
+  try {
+    await CreatorAPI.addAngle({
+      projectId,
+      angleTitle,
+      centralQuestion: String(document.getElementById("angleQuestion")?.value || "").trim(),
+      audiencePromise: String(document.getElementById("anglePromise")?.value || "").trim(),
+      rationale: String(document.getElementById("angleRationale")?.value || "").trim(),
+      storyPotential: document.getElementById("angleStoryPotential")?.value || "medium",
+      evidenceStrength: document.getElementById("angleEvidenceStrength")?.value || "moderate"
+    });
+    form.reset();
+    showToast("Story angle saved successfully.");
+  } catch (error) {
+    console.error("Add angle error:", error);
     handleApiError(error);
   } finally {
     submitButton.disabled = false;
