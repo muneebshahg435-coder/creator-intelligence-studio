@@ -79,6 +79,6 @@ test("mobile layout and request timeout safeguards exist", () => {
 
 test("deployed assets use the application version for cache busting", () => {
   for (const asset of ["css/style.css", "js/config.js", "js/api.js", "js/app.js"]) {
-    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.3\\.0`));
+    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.3\\.1`));
   }
 });
