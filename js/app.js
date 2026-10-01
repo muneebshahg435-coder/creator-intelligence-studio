@@ -1179,7 +1179,7 @@ function renderProductionWorkspace(production) {
   }));
   renderProductionList("scriptSectionsList", production.scripts, item => ({
     title: item.sectionName || item.title || "Untitled script section",
-    meta: [item.status, item.startTime && item.endTime ? `${item.startTime}–${item.endTime}` : item.startTime],
+    meta: [item.status, formatProductionRange(item.startTime, item.endTime)],
     detail: item.narration
   }));
   renderProductionList("visualPlanList", production.visuals, item => ({
@@ -1189,7 +1189,7 @@ function renderProductionWorkspace(production) {
   }));
   renderProductionList("editBlueprintList", production.editBlueprints, item => ({
     title: item.editingNotes || item.notes || "Untitled edit beat",
-    meta: [item.startTime && item.endTime ? `${item.startTime}–${item.endTime}` : item.startTime],
+    meta: [formatProductionRange(item.startTime, item.endTime)],
     detail: item.bRoll || item.graphics
   }));
   renderProductionList("publishingPackagesList", production.publishingPackages, item => ({
@@ -1222,6 +1222,33 @@ function truncateText(value, maximumLength) {
   return text.length > maximumLength
     ? `${text.slice(0, maximumLength - 1).trim()}…`
     : text;
+}
+
+function formatProductionRange(startTime, endTime) {
+  const start = formatProductionTime(startTime);
+  const end = formatProductionTime(endTime);
+  return start && end ? `${start}–${end}` : start || end;
+}
+
+function formatProductionTime(value) {
+  const text = String(value || "").trim();
+  if (!text) return "";
+  if (/^\d{1,2}:\d{2}(?::\d{2})?$/.test(text)) {
+    return text.slice(0, 5).padStart(5, "0");
+  }
+
+  const date = new Date(text);
+  if (Number.isNaN(date.getTime())) return text;
+
+  return new Intl.DateTimeFormat(
+    "en-GB",
+    {
+      timeZone: APP_CONFIG.timeZone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }
+  ).format(date);
 }
 
 

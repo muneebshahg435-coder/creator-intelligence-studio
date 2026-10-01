@@ -79,6 +79,12 @@ test("mobile layout and request timeout safeguards exist", () => {
 
 test("deployed assets use the application version for cache busting", () => {
   for (const asset of ["css/style.css", "js/config.js", "js/api.js", "js/app.js"]) {
-    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.3\\.1`));
+    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.3\\.2`));
   }
+});
+
+test("Google Sheets time values are normalized for display", () => {
+  assert.match(files.config, /timeZone:\s*"Asia\/Karachi"/);
+  assert.match(files.app, /function formatProductionTime\(value\)/);
+  assert.match(files.app, /formatProductionRange\(item\.startTime, item\.endTime\)/);
 });
