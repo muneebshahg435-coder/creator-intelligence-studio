@@ -1024,6 +1024,8 @@ function setupScriptWorkspace() {
   const projectSelect = document.getElementById("scriptProjectSelect");
   projectSelect?.addEventListener("change", handleProductionProjectSelection);
   document.getElementById("scriptSectionForm")?.addEventListener("submit", handleAddScriptSection);
+  document.getElementById("copyFullScriptButton")?.addEventListener("click", copyFullScript);
+  document.getElementById("downloadFullScriptButton")?.addEventListener("click", downloadFullScript);
 }
 
 function setupVisualWorkspace() {
@@ -1197,6 +1199,106 @@ function renderProductionWorkspace(production) {
     meta: [item.status],
     detail: item.selectedThumbnail || item.description
   }));
+  updateScriptExportButtons(production.scripts.length > 0);
+}
+
+function updateScriptExportButtons(hasScripts) {
+  ["copyFullScriptButton", "downloadFullScriptButton"].forEach(buttonId => {
+    const button = document.getElementById(buttonId);
+    if (button) button.disabled = !hasScripts;
+  });
+}
+
+function getOrderedScriptSections() {
+  return [...currentProjectProduction.scripts].sort((left, right) => {
+    const orderDifference = Number(left.sectionOrder || 0) - Number(right.sectionOrder || 0);
+    if (orderDifference) return orderDifference;
+    return String(left.createdAt || "").localeCompare(String(right.createdAt || ""));
+  });
+}
+
+function buildFullScriptText() {
+  const projectId = String(document.getElementById("scriptProjectSelect")?.value || "").trim();
+  const project = researchProjectsCache.find(item => item.projectId === projectId) || {};
+  const sections = getOrderedScriptSections();
+  if (!projectId || sections.length === 0) return "";
+
+  const title = String(project.title || "Untitled Video Script").trim();
+  const body = sections.map((section, index) => {
+    const sectionName = String(section.sectionName || `Section ${index + 1}`).trim();
+    const timeRange = formatProductionRange(section.startTime, section.endTime);
+    const heading = `${index + 1}. ${sectionName}${timeRange ? ` [${timeRange}]` : ""}`;
+    return `${heading}\n${String(section.narration || "").trim()}`;
+  }).join("\n\n");
+
+  return `${title.toUpperCase()}\n\n${body}\n`;
+}
+
+async function copyFullScript() {
+  const script = buildFullScriptText();
+  if (!script) {
+    showToast("Select a project with saved script sections first.");
+    return;
+  }
+
+  try {
+    await writeTextToClipboard(script);
+    showToast("Full script copied to the clipboard.");
+  }
+  catch (error) {
+    console.error("Copy full script error:", error);
+    showToast("The script could not be copied. Use Download Script instead.");
+  }
+}
+
+async function writeTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand("copy");
+  textarea.remove();
+  if (!copied) throw new Error("Clipboard copy was rejected.");
+}
+
+function downloadFullScript() {
+  const script = buildFullScriptText();
+  if (!script) {
+    showToast("Select a project with saved script sections first.");
+    return;
+  }
+
+  const projectId = String(document.getElementById("scriptProjectSelect")?.value || "").trim();
+  const project = researchProjectsCache.find(item => item.projectId === projectId) || {};
+  const fileName = `${sanitizeFileName(project.title || "creator-intelligence-script")}.txt`;
+  const objectUrl = URL.createObjectURL(new Blob([script], { type: "text/plain;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(objectUrl);
+  showToast("Full script downloaded.");
+}
+
+function sanitizeFileName(value) {
+  const fileName = String(value || "script")
+    .trim()
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "-")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 100);
+  return fileName || "script";
 }
 
 function renderProductionList(elementId, items, describeItem) {
