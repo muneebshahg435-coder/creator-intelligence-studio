@@ -15,7 +15,7 @@
 
   <title>Creator Intelligence Studio</title>
 
-  <link rel="stylesheet" href="css/style.css?v=0.3.2">
+  <link rel="stylesheet" href="css/style.css?v=0.4.0">
 </head>
 
 <body>
@@ -1213,7 +1213,13 @@
             <div class="create-actions"><div class="create-note"><span>✓</span>Save only material you can support with the linked evidence.</div><button class="primary-button" type="submit">Save Script Section</button></div>
           </form>
           <div class="saved-work-panel" aria-live="polite">
-            <div class="saved-work-heading"><span class="section-kicker">SAVED WORK</span><h3>Script Sections</h3></div>
+            <div class="saved-work-heading saved-work-heading-actions">
+              <div><span class="section-kicker">SAVED WORK</span><h3>Script Sections</h3></div>
+              <div class="script-export-actions">
+                <button class="secondary-button" id="copyFullScriptButton" type="button" disabled>Copy Full Script</button>
+                <button class="primary-button" id="downloadFullScriptButton" type="button" disabled>Download Script</button>
+              </div>
+            </div>
             <div id="scriptSectionsList" class="research-list"><p class="muted-copy">Choose a project to load its script sections.</p></div>
           </div>
         </section>
@@ -1388,9 +1394,9 @@
        SCRIPTS
   ========================== -->
 
-<script src="js/config.js?v=0.3.2"></script>
-<script src="js/api.js?v=0.3.2"></script>
-<script src="js/app.js?v=0.3.2"></script>
+<script src="js/config.js?v=0.4.0"></script>
+<script src="js/api.js?v=0.4.0"></script>
+<script src="js/app.js?v=0.4.0"></script>
   
 </body>
 </html>

@@ -54,7 +54,9 @@ test("production result panels are present", () => {
     "scriptSectionsList",
     "visualPlanList",
     "editBlueprintList",
-    "publishingPackagesList"
+    "publishingPackagesList",
+    "copyFullScriptButton",
+    "downloadFullScriptButton"
   ];
   assert.deepEqual(required.filter(id => !htmlIdSet.has(id)), []);
 });
@@ -79,7 +81,7 @@ test("mobile layout and request timeout safeguards exist", () => {
 
 test("deployed assets use the application version for cache busting", () => {
   for (const asset of ["css/style.css", "js/config.js", "js/api.js", "js/app.js"]) {
-    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.3\\.2`));
+    assert.match(files.html, new RegExp(`${asset.replace(".", "\\.")}\\?v=0\\.4\\.0`));
   }
 });
 
@@ -87,4 +89,38 @@ test("Google Sheets time values are normalized for display", () => {
   assert.match(files.config, /timeZone:\s*"Asia\/Karachi"/);
   assert.match(files.app, /function formatProductionTime\(value\)/);
   assert.match(files.app, /formatProductionRange\(item\.startTime, item\.endTime\)/);
+});
+
+test("saved script sections can be compiled, copied, and downloaded", () => {
+  assert.match(files.app, /function buildFullScriptText\(\)/);
+  assert.match(files.app, /function copyFullScript\(\)/);
+  assert.match(files.app, /function downloadFullScript\(\)/);
+  assert.match(files.app, /new Blob\(\[script\]/);
+});
+
+test("full script compilation orders sections and normalizes time ranges", () => {
+  const context = vm.createContext({
+    APP_CONFIG: { timeZone: "Asia/Karachi" },
+    clearTimeout,
+    console,
+    document: {
+      addEventListener() {},
+      getElementById(id) {
+        return id === "scriptProjectSelect" ? { value: "project-1" } : null;
+      }
+    },
+    navigator: {},
+    setTimeout,
+    window: {}
+  });
+  new vm.Script(files.app, { filename: "app.js" }).runInContext(context);
+  const compiled = vm.runInContext(`
+    researchProjectsCache = [{ projectId: "project-1", title: "Solar Demo" }];
+    currentProjectProduction.scripts = [
+      { sectionOrder: 2, sectionName: "Context", startTime: "00:35", endTime: "01:10", narration: "Context narration." },
+      { sectionOrder: 1, sectionName: "Hook", startTime: "1899-12-29T19:31:48.000Z", endTime: "1899-12-29T20:06:48.000Z", narration: "Hook narration." }
+    ];
+    buildFullScriptText();
+  `, context);
+  assert.equal(compiled, "SOLAR DEMO\n\n1. Hook [00:00–00:35]\nHook narration.\n\n2. Context [00:35–01:10]\nContext narration.\n");
 });

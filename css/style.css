@@ -1982,6 +1982,25 @@ button:disabled {
   margin: 4px 0 0;
 }
 
+.saved-work-heading-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.script-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.script-export-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
 .production-item {
   align-items: flex-start;
 }
@@ -2027,6 +2046,19 @@ button:disabled {
 @media (max-width: 850px) {
 
   .research-results-grid { grid-template-columns: 1fr; }
+
+  .saved-work-heading-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .script-export-actions {
+    width: 100%;
+  }
+
+  .script-export-actions button {
+    flex: 1 1 180px;
+  }
 
   .research-summary-grid {
     grid-template-columns: 1fr;

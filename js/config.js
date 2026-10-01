@@ -19,7 +19,7 @@ const APP_CONFIG = Object.freeze({
 
   appName: "Creator Intelligence Studio",
 
-  version: "v0.3.2",
+  version: "v0.4.0",
 
   environment: "production",
 
